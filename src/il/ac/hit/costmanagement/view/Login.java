@@ -45,8 +45,11 @@ public class Login extends HttpServlet {
                 addCookies(response,email,password);
                 User user = dao.getCurrentUser(email);
                 request.setAttribute("currentUser", user);
-                request.getRequestDispatcher("costchart.jsp").forward(request, response);
-                response.sendRedirect("costchart.jsp");
+                request.getRequestDispatcher("home.jsp").forward(request, response);
+              //  response.sendRedirect("home.jsp");
+                /*request.getRequestDispatcher("costchart.jsp").forward(request, response);
+                response.sendRedirect("costchart.jsp");*/
+                
             }
 
         } catch (CostManagementException | ServletException | IOException e) {

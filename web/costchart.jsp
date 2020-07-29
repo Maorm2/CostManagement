@@ -3,6 +3,8 @@
 <%@ page import="il.ac.hit.costmanagement.model.CostManagementDAO" %>
 <%@ page import="il.ac.hit.costmanagement.model.IIncomingDAO" %>
 <%@ page import="il.ac.hit.costmanagement.model.ISpendDAO" %>
+<%@ page import="java.sql.Date" %>
+<%@ page import="java.util.Calendar" %>
 <%--
   Created by IntelliJ IDEA.
   User: Maor
@@ -15,6 +17,7 @@
     private ISpendDAO spendDAO = CostManagementDAO.getInstance();
     private IIncomingDAO incomingDAO = CostManagementDAO.getInstance();
     private User user;
+    private int month = new Date(Calendar.getInstance().getTimeInMillis()).toLocalDate().getMonth().getValue();
 
     private double shopping = 0;
     private double transport = 0;
@@ -39,6 +42,10 @@
     private double novemberSpend = 0;
     private double decemberSpend = 0;
 
+    double[] monthsSpend = {januarySpend,februarySpend,marchSpend,aprilSpend,
+            maySpend,juneSpend,julySpend,augustSpend,septemberSpend,octoberSpend,
+            novemberSpend,decemberSpend};
+
 
     double januaryIncome = 0;
     double februaryIncome = 0;
@@ -53,6 +60,16 @@
     double novemberIncome = 0;
     double decemberIncome = 0;
 
+    double[] monthIncome = {januaryIncome,februaryIncome,marchIncome,aprilIncome,
+            mayIncome,juneIncome,julyIncome,augustIncome,septemberIncome,octoberIncome,
+            novemberIncome,decemberIncome};
+
+    double totalIncomeForMonth = 0;
+    double totalSpendForMonth = 0;
+    double totalAllCosts = 0;
+    double incomePercent = 0;
+    double spendPercent = 0;
+
 %>
 
 <%
@@ -61,16 +78,31 @@
     try {
         getAllCategories();
         getAllYearCosts();
+        incomePercent = calculatePercentage(totalIncomeForMonth,totalAllCosts);
+        spendPercent = calculatePercentage(totalSpendForMonth,totalAllCosts);
+
+        System.out.println("income per: " + incomePercent);
+        System.out.println("cost per: " + spendPercent);
+
+        incomePercent = Math.floor(incomePercent * 10) / 10;
+        spendPercent = Math.floor(spendPercent * 10) / 10;
+
+        System.out.println("income per: " + incomePercent);
+        System.out.println("cost per: " + spendPercent);
+
     } catch (CostManagementException e) {
         e.printStackTrace();
     }
-
 %>
+
+
+
 
 
 
 <html>
 <head>
+
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
         google.charts.load('current', {'packages':['corechart']});
@@ -94,6 +126,7 @@
             var options = {
                 title: 'My Monthly costs',
                 is3D : true,
+                backgroundColor: 'transparent'
             };
 
 
@@ -103,6 +136,7 @@
 
         }
     </script>
+    <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
 <div id="piechart" style="width: 900px; height: 500px;"></div>
@@ -112,6 +146,7 @@
 
 <html>
 <head>
+
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
         google.charts.load('current', {'packages':['corechart']});
@@ -120,24 +155,25 @@
         function drawChart() {
             var data = google.visualization.arrayToDataTable([
                 ['Month', 'Incoming', 'Spend'],
-                ['January',  <%=januaryIncome%>,      <%=januarySpend%>],
-                ['February',  <%=februaryIncome%>,      <%=februarySpend%>],
-                ['March',  <%=marchIncome%>,       <%=marchSpend%>],
-                ['April',  <%=aprilIncome%>,      <%=aprilSpend%>],
-                ['May',  <%=mayIncome%>,       <%=maySpend%>],
-                ['June',  <%=juneIncome%>,       <%=juneSpend%>],
-                ['July',  <%=julyIncome%>,       <%=julySpend%>],
-                ['August',  <%=augustIncome%>,       <%=augustSpend%>],
-                ['September',  <%=septemberIncome%>,       <%=septemberSpend%>],
-                ['October',  <%=octoberIncome%>,       <%=octoberSpend%>],
-                ['November',  <%=novemberIncome%>,       <%=novemberSpend%>],
-                ['December',  <%=decemberIncome%>,       <%=decemberSpend%>],
+                ['January',  <%=monthIncome[0]%>,      <%=monthsSpend[0]%>],
+                ['February',  <%=monthIncome[1]%>,      <%=monthsSpend[1]%>],
+                ['March',  <%=monthIncome[2]%>,       <%=monthsSpend[2]%>],
+                ['April',  <%=monthIncome[3]%>,      <%=monthsSpend[3]%>],
+                ['May',  <%=monthIncome[4]%>,       <%=monthsSpend[4]%>],
+                ['June',  <%=monthIncome[5]%>,       <%=monthsSpend[5]%>],
+                ['July',  <%=monthIncome[6]%>,       <%=monthsSpend[6]%>],
+                ['August',  <%=monthIncome[7]%>,       <%=monthsSpend[7]%>],
+                ['September',  <%=monthIncome[8]%>,       <%=monthsSpend[8]%>],
+                ['October',  <%=monthIncome[9]%>,       <%=monthsSpend[9]%>],
+                ['November',  <%=monthIncome[10]%>,       <%=monthsSpend[10]%>],
+                ['December',  <%=monthIncome[11]%>,       <%=monthsSpend[11]%>],
             ]);
 
             var options = {
                 title: 'My year cost',
                 curveType: 'function',
-                legend: { position: 'bottom' }
+                legend: { position: 'bottom' },
+                backgroundColor: 'transparent'
             };
 
             var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
@@ -145,9 +181,66 @@
             chart.draw(data, options);
         }
     </script>
+    <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-<div id="curve_chart" style="width: 1000px; height: 400px"></div>
+
+<div id="curve_chart"  style="width: 1000px; height: 400px"></div>
+</body>
+</html>
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <link
+            href="https://fonts.googleapis.com/css?family=Montserrat&display=swap"
+            rel="stylesheet"
+    />
+    <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<!-- Container containing all the elements -->
+<div class="circleBar">
+
+    <!-- Refresh button -->
+    <!-- Container for circular progress bar -->
+    <div class="container ">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <div
+                        class="spend"
+                        data-value="<%=spendPercent/100%>"
+                        data-size="160"
+                        data-thickness="4"
+                >
+                    <strong></strong>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div
+                        class="round"
+                        data-value="<%=incomePercent/100%>"
+                        data-size="160"
+                        data-thickness="4"
+                >
+                    <strong></strong>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="webloper-sm">
+
+    </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-circle-progress/1.2.0/circle-progress.min.js"></script>
+<script src="function.js"></script>
 </body>
 </html>
 
@@ -156,32 +249,23 @@
 
 <%!
     private void getAllYearCosts() throws CostManagementException {
-        januarySpend = spendDAO.getSpendByMonth(user.getId(),1);
-        februarySpend = spendDAO.getSpendByMonth(user.getId(),2);
-        marchSpend = spendDAO.getSpendByMonth(user.getId(),3);
-        aprilSpend = spendDAO.getSpendByMonth(user.getId(),4);
-        maySpend = spendDAO.getSpendByMonth(user.getId(),5);
-        juneSpend = spendDAO.getSpendByMonth(user.getId(),6);
-        julySpend = spendDAO.getSpendByMonth(user.getId(),7);
-        augustSpend = spendDAO.getSpendByMonth(user.getId(),8);
-        septemberSpend = spendDAO.getSpendByMonth(user.getId(),9);
-        octoberSpend = spendDAO.getSpendByMonth(user.getId(),10);
-        novemberSpend = spendDAO.getSpendByMonth(user.getId(),11);
-        decemberSpend = spendDAO.getSpendByMonth(user.getId(),12);
+        System.out.println("user: " + user.toString());
 
-        januaryIncome = incomingDAO.getIncomeByMonth(user.getId(),1);
-        februaryIncome = incomingDAO.getIncomeByMonth(user.getId(),2);
-        marchIncome = incomingDAO.getIncomeByMonth(user.getId(),3);
-        aprilIncome = incomingDAO.getIncomeByMonth(user.getId(),4);
-        mayIncome = incomingDAO.getIncomeByMonth(user.getId(),5);
-        juneIncome = incomingDAO.getIncomeByMonth(user.getId(),6);
-        julyIncome = incomingDAO.getIncomeByMonth(user.getId(),7);
-        augustIncome = incomingDAO.getIncomeByMonth(user.getId(),8);
-        septemberIncome =incomingDAO.getIncomeByMonth(user.getId(),9);
-        octoberIncome = incomingDAO.getIncomeByMonth(user.getId(),10);
-        novemberIncome = incomingDAO.getIncomeByMonth(user.getId(),11);
-        decemberIncome = incomingDAO.getIncomeByMonth(user.getId(),12);
+       for(int i = 0; i<monthsSpend.length; i++){
+           monthsSpend[i] = spendDAO.getSpendByMonth(user.getId(),i+1);
+           if(i+1==month)
+               totalSpendForMonth = monthsSpend[i];
+       }
 
+
+
+        for(int i = 0; i<monthIncome.length; i++){
+            monthIncome[i] = incomingDAO.getIncomeByMonth(user.getId(),i+1);
+            if(i+1==month)
+                totalIncomeForMonth = monthIncome[i];
+        }
+
+        totalAllCosts = Math.abs(totalIncomeForMonth + totalSpendForMonth);
     }
 
     public void getAllCategories() throws CostManagementException {
@@ -195,6 +279,13 @@
         government = spendDAO.getSpendByCategory(user,"Government");
         food = spendDAO.getSpendByCategory(user,"Food");
     }
+
+
+        public double calculatePercentage(double obtained, double total) {
+            return obtained * 100 / total;
+        }
+
+
 %>
 
 

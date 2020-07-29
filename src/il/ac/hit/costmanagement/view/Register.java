@@ -5,6 +5,7 @@ import il.ac.hit.costmanagement.exception.CostManagementException;
 import il.ac.hit.costmanagement.model.CostManagementDAO;
 import il.ac.hit.costmanagement.model.IUserDAO;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -21,7 +22,11 @@ public class Register extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-         response.setContentType("text/html");
+        RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/controller/");
+        dispatcher.include(request,response);
+
+
+        /* response.setContentType("text/html");
           String email = request.getParameter("email");
           String password = request.getParameter("password");
           IUserDAO dao = CostManagementDAO.getInstance();
@@ -34,6 +39,6 @@ public class Register extends HttpServlet {
               PrintWriter writer = response.getWriter();
               writer.print(e.getMessage());
               e.printStackTrace();
-          }
+          }*/
     }
 }

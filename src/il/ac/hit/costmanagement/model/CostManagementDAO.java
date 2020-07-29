@@ -280,6 +280,7 @@ public class CostManagementDAO implements IIncomingDAO,
     @Override
     public double getSpendByCategory(User user, String category) throws CostManagementException {
 
+        System.out.println("user get spend function: " + user.toString());
         int userId = user.getId();
         double amountCategory = 0;
 
