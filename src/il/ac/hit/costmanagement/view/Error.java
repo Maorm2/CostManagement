@@ -1,7 +1,5 @@
 package il.ac.hit.costmanagement.view;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -12,60 +10,47 @@ import java.io.PrintWriter;
 @WebServlet(name = "/error",urlPatterns = {"/error"})
 public class Error extends HttpServlet {
 
+    public final static String REGISTER_ERROR = "User name is already exists";
+    public final static String LOGIN_ERROR = "Username or password is incorrect";
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) {
 
     }
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         PrintWriter out = response.getWriter();
 
         String error = (String)request.getAttribute("error");
 
         switch (error){
-            case "User name is already exists":
+            case REGISTER_ERROR:
                 printRegisterError(out);
                 break;
-            case "Username or password is incorrect":
-                printLoginFailed(response,request,out);
+            case LOGIN_ERROR:
+                printLoginError(out);
                 break;
             default:
-                printDefaultError(response,request,out);
+                printDefaultError(out);
         }
     }
 
-    private void printDefaultError(HttpServletResponse response, HttpServletRequest request, PrintWriter out) throws ServletException, IOException {
-        out.print("<!DOCTYPE html>\n" +
-                "<html>\n" +
-                "<body>\n" +
-                "\n" +
-                "<script>\n" +
-                "  alert(\"Something went wrong!\");\n" +
-                "</script>\n" +
-                "\n" +
-                "</body>\n" +
-                "</html>"
-        );
+    private void printDefaultError(PrintWriter out) {
 
-        request.getRequestDispatcher("login.jsp").forward(request, response);
+        out.println("<script type=\"text/javascript\">");
+        out.println("alert('Something went wrong!');");
+        out.println("location='login.jsp';");
+        out.println("</script>");
 
     }
 
-    private void printLoginFailed(HttpServletResponse response, HttpServletRequest request, PrintWriter out) throws ServletException, IOException {
-        out.print("<!DOCTYPE html>\n" +
-                "<html>\n" +
-                "<body>\n" +
-                "\n" +
-                "<script>\n" +
-                "  alert(\"Username or password is incorrect!\");\n" +
-                "</script>\n" +
-                "\n" +
-                "</body>\n" +
-                "</html>"
-        );
+    private void printLoginError(PrintWriter out) {
 
-        request.getRequestDispatcher("login.jsp").forward(request, response);
+        out.println("<script type=\"text/javascript\">");
+        out.println("alert('Username or password is incorrect!');");
+        out.println("location='login.jsp';");
+        out.println("</script>");
 
     }
 

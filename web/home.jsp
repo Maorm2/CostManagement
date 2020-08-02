@@ -1,13 +1,10 @@
 <%@ page import="java.util.Date" %>
 <%@ page import="java.util.Calendar" %>
 <%@ page import="java.util.GregorianCalendar" %>
-<%@ page import="il.ac.hit.costmanagement.model.ISpendDAO" %>
-<%@ page import="il.ac.hit.costmanagement.model.CostManagementDAO" %>
-<%@ page import="il.ac.hit.costmanagement.model.IIncomingDAO" %>
 <%@ page import="il.ac.hit.costmanagement.dm.User" %>
 <%@ page import="il.ac.hit.costmanagement.exception.CostManagementException" %>
-<%@ page import="il.ac.hit.costmanagement.model.IUserDAO" %>
 <%@ page import="java.time.LocalDate" %>
+<%@ page import="il.ac.hit.costmanagement.model.*" %>
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%!
@@ -20,9 +17,12 @@
 
 
     private ISpendDAO spendDAO = CostManagementDAO.getInstance();
+    private IIncomingDAO incomingDAO = CostManagementDAO.getInstance();
+    private ITotalSpend totalSpendDAO =CostManagementDAO.getInstance();
+
     private User user;
 
-    private double shopping = 0;
+    /*private double shopping = 0;
     private double transport = 0;
     private double restaurant = 0;
     private double health = 0;
@@ -30,25 +30,61 @@
     private double groceries = 0;
     private double leisure = 0;
     private double government = 0;
-    private  double food = 0;
+    private  double food = 0;*/
 
 
-    double totalSpendForMonth = 0;
-
-
+    double totalForMonth = 0;
+    double spendForMonth = 0;
+    double incomeForMonth = 0;
 
 %>
 
 <%
-    user = (User)request.getAttribute("currentUser");
+
+   /* shopping = (double) request.getSession().getAttribute("shopping");
+    transport = (double)request.getSession().getAttribute("transport");
+    restaurant = (double)request.getSession().getAttribute("restaurant");
+    health = (double) request.getSession().getAttribute("health");
+    family = (double) request.getSession().getAttribute("family");
+    groceries = (double)request.getSession().getAttribute("groceries");
+    leisure = (double) request.getSession().getAttribute("leisure");
+    government = (double) request.getSession().getAttribute("government");
+    food = (double) request.getSession().getAttribute("food");*/
+
+    spendForMonth = (double) request.getSession().getAttribute("spendForMonth");
+    incomeForMonth = (double) request.getSession().getAttribute("incomeForMonth");
+    totalForMonth = (double) request.getSession().getAttribute("totalAmountForMonth");
+
+
+
+  /*  //user = (User)request.getAttribute("currentUser");
+    user = (User)session.getAttribute("currentUser");
+
+    if(user == null) {
+       // response.sendRedirect("err.jsp");
+       response.sendRedirect(request.getContextPath()+"/err.jsp");
+      //  request.getRequestDispatcher("err.jsp").forward(request,response);
+
+       // request.getRequestDispatcher("err.jsp").forward(request,response);
+
+    }
+
+
     try {
+        System.out.println("Arrive try");
         getAllCategories();
         getSpendByMonth();
-        System.out.println("maxDaysInMonth: " + maxDaysInMonth);
-        System.out.println("dayOfWeek: " + dayOfMonth);
+        getIncomeByMonth();
+        getTotalAmountByMonth();
+
+        System.out.println("max days in month: " + maxDaysInMonth);
+        System.out.println("current day: " + dayOfMonth);
+        totalForMonth = Math.abs(spendForMonth + incomeForMonth);
+
+
     } catch (CostManagementException e) {
         e.printStackTrace();
-    }
+    }*/
 %>
 
 
@@ -61,6 +97,47 @@
 
 <!DOCTYPE html><html lang='en' class=''>
 <head>
+
+
+
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <!------ Include the above in your HEAD tag ---------->
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css">
+    <link rel="stylesheet" href="css/style.css">
+    <div>
+        <nav class="navbar navbar-expand-lg navbar-light navbar-laravel">
+            <div class="container">
+                <a class="navbar-brand" href="home.jsp">Cost Management</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="${pageContext.request.contextPath}/graphs">Statistics</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="${pageContext.request.contextPath}/categories">Statistics per category</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="addincome.jsp">Add income</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="addspend.jsp">Add spend</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="login.jsp">Logout</a>
+                        </li>
+
+                    </ul>
+
+                </div>
+            </div>
+        </nav>
 
     <link rel='stylesheet prefetch' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css'><link rel='stylesheet prefetch' href='//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css'>
     <style class="cp-pen-styles">@import url(https://fonts.googleapis.com/css?family=Lato:400,300,700);
@@ -211,7 +288,7 @@
         display: -webkit-box;
         display: -ms-flexbox;
         display: flex;
-        width: 330px;
+        width: 300px;
         border-radius: 5px;
     }
 
@@ -323,7 +400,7 @@
         border-radius: 5px;
         padding: 20px;
         margin: 10px;
-        width: 330px;
+        width: 280px;
         -webkit-transition: all 0.2s ease-in-out;
         transition: all 0.2s ease-in-out;
         box-shadow: 0 10px 20px 0 rgba(13, 59, 86, 0.5);
@@ -371,27 +448,29 @@
 
     .goal__name {
         color: #777;
-        font-size: .75rem;
+        font-size: 1.25rem;
         text-align: center;
-        width: 80%;
+        width: 50%;
         margin: 10px auto;
         text-transform: uppercase;
         letter-spacing: 3px;
     }
     .goal--progress {
         color: #222;
-        font-size: 1.7rem;
-        margin-bottom: 10px;
+        font-size: 1rem;
         text-align: center;
+        margin-top: 10px;
     }
     .goal--remain {
         color: #222;
     }
     .goal--amount {
         color: #777;
-        font-size: .8rem;
+        font-size: .7rem;
         text-align: center;
+        margin-bottom: 10px;
     }
+
     .goal--top {
         display: -webkit-box;
         display: -ms-flexbox;
@@ -401,7 +480,7 @@
         -ms-flex-direction: column;
         flex-direction: column;
         position: relative;
-        height: 375px;
+        height: 300px;
     }
     .goal--top__container {
         margin: auto;
@@ -449,7 +528,7 @@
 
     .descriptor {
         font-size: .8rem;
-        margin-bottom: 20px;
+        margin-bottom: 10px;
     }
 
     .dropdown-wrapper {
@@ -563,9 +642,10 @@
     }
 
     .box {
-        width: 100%;
-        height: 100%;
+        width: 80%;
+        height: 80%;
         margin: 0 auto;
+        margin-bottom: 30px;
         position: absolute;
         left: 0;
         right: 0;
@@ -585,7 +665,7 @@
     }
 
     .shadow {
-        opacity: .6;
+        opacity: 0.8;
     }
 
     @-webkit-keyframes dash {
@@ -633,6 +713,8 @@ var Pie = function (_React$Component) {
         var color = _props.color;
         var width = _props.width;
         var progress = _props.progress;
+        var category = "spend";
+        var cat = 0;
 
         var pi = 3.14159265359;
         var r = 400 / 2;
@@ -668,7 +750,8 @@ var Pie = function (_React$Component) {
                         fillOpacity: "0",
                         strokeWidth: width + 10,
                         strokeDasharray: [realProgress, c],
-                        strokeDashoffset: c * progress
+                        strokeDashoffset: c * progress,
+                        categoryName: "spend"
                     }),
                     React.createElement("circle", {
                         filter: "url(#shadow)",
@@ -731,7 +814,7 @@ var Application = function (_React$Component2) {
                 { className: "box" },
                 React.createElement(Pie, {
                     color: colorChart,
-                    width: 15,
+                    width: 10,
                     progress: percent
 
                 })
@@ -745,18 +828,20 @@ var Application = function (_React$Component2) {
 var progressUpdate;
 var goals = [{
     category: 'car',
-    name: 'Food',
-    amount: <%=totalSpendForMonth%>,
-    progress: <%=food%>,
+    name: 'Spend',
+    amount: <%=totalForMonth%>,
+    progress: <%=spendForMonth%>,
     flipped: false,
-    dragStatus: true
+    dragStatus: true,
+    categoryName:  "spend"
 }, {
     category: 'plane',
-    name: 'Food',
-    amount: 3500,
-    progress: 2984,
+    name: 'Income',
+    amount: <%=totalForMonth%>,
+    progress: <%=incomeForMonth%>,
     flipped: false,
-    dragStatus: true
+    dragStatus: true,
+
 }];
 
 var dragStatus = true;
@@ -856,14 +941,18 @@ var GoalCard = function (_React$Component3) {
         if (this.props.item.progress / this.props.item.amount < 1) {
             strokeColor = "#01579B";
             status = "Remaining days to month";
-            remaining = <%=maxDaysInMonth-dayOfMonth%> + "  days";
-            //percentRemaining = <%=maxDaysInMonth%>;
-        } else {
+            remaining = <%=maxDaysInMonth-dayOfMonth%> +"  days";
+
+        }
+        if(this.props.item.categoryName == "spend"){
+            strokeColor = "#FF3D00";
+        }
+       /* } else {
             strokeColor = "#7dbf69";
             status = "Exceeded";
             remaining = Math.abs(this.props.item.amount - this.props.item.progress).toLocaleString();
             percentRemaining = "(" + Math.abs((this.props.item.amount - this.props.item.progress) / this.props.item.amount * 100).toFixed(0) + "%)";
-        }
+        }*/
 
         return React.createElement(
             "div",
@@ -874,11 +963,6 @@ var GoalCard = function (_React$Component3) {
                 React.createElement(
                     "div",
                     { className: "goal--top" },
-                    React.createElement(
-                        "a",
-                        { href: "#", className: "edit", onClick: this.editGoal.bind(this, this.props.item.index) },
-                        React.createElement("i", { className: "fa fa-pencil-square-o" })
-                    ),
                     React.createElement(
                         "div",
                         { className: "goal__name" },
@@ -1080,16 +1164,6 @@ var Example = React.createClass({
             "div",
             null,
             React.createElement(
-                Button,
-                {
-                    bsStyle: "primary",
-                    bsSize: "large",
-                    onClick: this.open,
-                    className: "button"
-                },
-                "Add funds"
-            ),
-            React.createElement(
                 Modal,
                 { show: this.state.showModal, onHide: this.close },
                 React.createElement(
@@ -1288,24 +1362,27 @@ var GoalList = React.createClass({
 ReactDOM.render(React.createElement(GoalList, { data: goals }), document.getElementById('app'));
 
 //# sourceURL=pen.js
-
-
-
-
-
-
 </script>
+</div>
 </body></html>
 
 
 <%!
+   /* private void getTotalAmountByMonth() throws CostManagementException {
+        totalForMonth = totalSpendDAO.getTotalAmountByMonth(user.getId(),month);
+    }
+
+    private void getIncomeByMonth() throws CostManagementException {
+        incomeForMonth = totalSpendDAO.getTotalIncomeByMonth(user.getId(),month);
+    }
+
     private void getSpendByMonth() throws CostManagementException {
-
-        totalSpendForMonth = spendDAO.getSpendByMonth(user.getId(),month);
-
+        spendForMonth = totalSpendDAO.getTotalSpendByMonth(user.getId(),month);
+        System.out.println("in FUNCTION: " + spendForMonth);
     }
 
     public void getAllCategories() throws CostManagementException {
+        System.out.println("Arrive all categories");
         shopping = spendDAO.getSpendByCategory(user,"Shopping");
         transport = spendDAO.getSpendByCategory(user,"Transport");
         restaurant = spendDAO.getSpendByCategory(user,"Restaurant");
@@ -1315,5 +1392,6 @@ ReactDOM.render(React.createElement(GoalList, { data: goals }), document.getElem
         leisure = spendDAO.getSpendByCategory(user,"Leisure");
         government = spendDAO.getSpendByCategory(user,"Government");
         food = spendDAO.getSpendByCategory(user,"Food");
-    }
+        System.out.println("end all categories");
+    }*/
 %>

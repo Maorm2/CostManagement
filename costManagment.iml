@@ -49,5 +49,6 @@
     <orderEntry type="library" name="font-awesome" level="application" />
     <orderEntry type="library" name="events_runner-73716630c22bbc8cff4bd0f07b135f00a0bdc5d14629260c3ec49e5606f98fdd" level="application" />
     <orderEntry type="library" name="css_live_reload_init-2c0dc5167d60a5af3ee189d570b1835129687ea2a61bee3513dee3a50c115a77" level="application" />
+    <orderEntry type="library" name="jquery-3.3.1.slim" level="application" />
   </component>
 </module>

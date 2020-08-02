@@ -17,17 +17,8 @@
     private ISpendDAO spendDAO = CostManagementDAO.getInstance();
     private IIncomingDAO incomingDAO = CostManagementDAO.getInstance();
     private User user;
-    private int month = new Date(Calendar.getInstance().getTimeInMillis()).toLocalDate().getMonth().getValue();
+   /* private int month = new Date(Calendar.getInstance().getTimeInMillis()).toLocalDate().getMonth().getValue();
 
-    private double shopping = 0;
-    private double transport = 0;
-    private double restaurant = 0;
-    private double health = 0;
-    private  double family = 0;
-    private double groceries = 0;
-    private double leisure = 0;
-    private double government = 0;
-    private  double food = 0;
 
     private double januarySpend = 0;
     private double februarySpend = 0;
@@ -68,7 +59,7 @@
     double totalSpendForMonth = 0;
     double totalAllCosts = 0;
     double incomePercent = 0;
-    double spendPercent = 0;
+    double spendPercent = 0;*/
 
 %>
 
@@ -76,7 +67,6 @@
     user = (User)request.getAttribute("currentUser");
 
     try {
-        getAllCategories();
         getAllYearCosts();
         incomePercent = calculatePercentage(totalIncomeForMonth,totalAllCosts);
         spendPercent = calculatePercentage(totalSpendForMonth,totalAllCosts);
@@ -266,18 +256,6 @@
         }
 
         totalAllCosts = Math.abs(totalIncomeForMonth + totalSpendForMonth);
-    }
-
-    public void getAllCategories() throws CostManagementException {
-        shopping = spendDAO.getSpendByCategory(user,"Shopping");
-        transport = spendDAO.getSpendByCategory(user,"Transport");
-        restaurant = spendDAO.getSpendByCategory(user,"Restaurant");
-        health = spendDAO.getSpendByCategory(user,"Health");
-        family = spendDAO.getSpendByCategory(user,"Family");
-        groceries = spendDAO.getSpendByCategory(user,"Groceries");
-        leisure = spendDAO.getSpendByCategory(user,"Leisure");
-        government = spendDAO.getSpendByCategory(user,"Government");
-        food = spendDAO.getSpendByCategory(user,"Food");
     }
 
 

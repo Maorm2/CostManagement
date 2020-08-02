@@ -13,6 +13,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import javax.servlet.RequestDispatcher;
+import javax.ws.rs.Path;
 
 
 import java.io.*;
@@ -20,6 +21,7 @@ import java.io.*;
 /**
  * Servlet implementation class RouterServlet
  */
+
 @WebServlet("/controller/*")
 public class RouterServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
@@ -87,7 +89,9 @@ public class RouterServlet extends HttpServlet {
 
             // creating a RequestDispatcher object that points at the JSP document
             // which is view of our action
-            RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/view/"+action+".jsp");
+
+            RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/view/" + action + ".jsp");
+
             dispatcher.include(request,response);
 
 

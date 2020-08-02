@@ -23,7 +23,7 @@ public class CostManagementDAO implements IIncomingDAO,
     private Session session;
     private SessionFactory factory;
     private Query hql;
-    private String query = "from Incoming where transactionId = :id";
+    private String query;
     private double spend;
     private double income;
     private double total = 0;
@@ -40,7 +40,6 @@ public class CostManagementDAO implements IIncomingDAO,
     }
 
     public static CostManagementDAO getInstance()  {
-
         return instance == null ? instance = new CostManagementDAO() : instance;
     }
 
@@ -139,6 +138,7 @@ public class CostManagementDAO implements IIncomingDAO,
     public double getIncomeByMonth(int id, int month) throws CostManagementException {
 
         Incoming incoming;
+        income = 0;
 
         if(!session.isOpen()){
             session = factory.openSession();
@@ -183,7 +183,6 @@ public class CostManagementDAO implements IIncomingDAO,
         }
 
         finally {
-            income = 0;
             if(session!=null)
                 session.close();
         }
@@ -280,9 +279,13 @@ public class CostManagementDAO implements IIncomingDAO,
     @Override
     public double getSpendByCategory(User user, String category) throws CostManagementException {
 
-        System.out.println("user get spend function: " + user.toString());
         int userId = user.getId();
-        double amountCategory = 0;
+        double amountCategory;
+        String cat;
+        Date date;
+
+        Integer id;
+        double amount;
 
         if(!session.isOpen()){
             session = factory.openSession();
@@ -303,16 +306,26 @@ public class CostManagementDAO implements IIncomingDAO,
             }
 
             if(spendList.isEmpty())
-               return 0;
+                return 0;
+
 
             else{
-                for(Spend spend : spendList){
-                    if(spend.getDate().toLocalDate().getMonth().getValue()== month)
-                        amountCategory = amountCategory + spend.getAmount();
+
+                Query q = session.createQuery("select e.id, e.amount , e.category , e.date from Spend e");
+                List<Object[]> employees= (List<Object[]>)q.list();
+                amountCategory =0;
+                for(Object[] employee: employees){
+                    id = (Integer)employee[0];
+                    amount = (double)employee[1];
+                    cat = (String)employee[2];
+                    date = (Date)employee[3];
+
+                    if(userId == id && category.equals(cat) &&  date.toLocalDate().getMonth().getValue() == month)
+                        amountCategory = amountCategory + amount;
+
                 }
             }
 
-            System.out.println(" Costs for month " + month + ":\n are: " + amountCategory +" for category: " + category);
         }
 
         catch (HibernateException e){
@@ -324,6 +337,7 @@ public class CostManagementDAO implements IIncomingDAO,
         finally {
             if(session!=null)
                 session.close();
+
         }
         return amountCategory;
     }
@@ -331,6 +345,7 @@ public class CostManagementDAO implements IIncomingDAO,
     @Override
     public double getSpendByMonth(int id, int month) throws CostManagementException {
 
+        spend = 0;
         Spend spendTable;
 
         if(!session.isOpen()){
@@ -343,6 +358,8 @@ public class CostManagementDAO implements IIncomingDAO,
             hql.setParameter("id", id);
             List<Spend> spendList = hql.list();
 
+            System.out.println("spndlist " + spendList.toString());
+
             if (session.getTransaction().getStatus() == TransactionStatus.FAILED_COMMIT) {
                 if (session.getTransaction().isActive())
                     session.getTransaction().rollback();
@@ -354,18 +371,82 @@ public class CostManagementDAO implements IIncomingDAO,
             if(spendList.isEmpty()) {
                 return 0;
             }
-            else {
+
+
                 spendTable = spendList.get(0);
                 Iterator<Spend> iterator = spendList.iterator();
-
+                System.out.println("size: spendlist " + spendList.size());
+                System.out.println("SpendTable amount : " + spendTable.getAmount());
                 while (iterator.hasNext()) {
+                    System.out.println("Spend in while: " + spend);
+                    System.out.println("curent month: " + month +"\n local date: " + spendTable.getDate().toLocalDate().getMonth().getValue());
+                    System.out.println("TransAction id: " + spendTable.getTransactionId());
                     if (month == spendTable.getDate().toLocalDate().getMonth().getValue()) {
                         spend = spend + spendTable.getAmount();
+                        System.out.println("Spend in if: " + spend);
                     }
+                    System.out.println("Spend table: " + spendTable);
                     spendTable = iterator.next();
+                    System.out.println("iterator: " + iterator.next().toString());
+                    System.out.println("Spend table: " + spendTable);
                 }
+                System.out.println("Spend in model: " + spend);
                 return spend;
+
+
+        }
+
+
+        catch (HibernateException e){
+            if(session.getTransaction().isActive())
+                session.getTransaction().rollback();
+            throw new CostManagementException(e.getMessage());
+        }
+
+        finally {
+           if(session!=null)
+                session.close();
+        }
+
+    }
+
+
+    @Override
+    public double getTotalIncomeByMonth(int id, int month) throws CostManagementException {
+        spend = 0;
+        income = 0;
+        total = 0;
+        TotalSpend totalIncome;
+
+        if(!session.isOpen()){
+            session = factory.openSession();
+            session.beginTransaction();
+        }
+
+        try{
+            hql = session.createQuery("from TotalSpend where month = :month and id = :id");
+            hql.setParameter("month", month).setParameter("id",id);
+            List<TotalSpend> totalIncomeList = hql.list();
+
+
+            if(session.getTransaction().getStatus() == TransactionStatus.FAILED_COMMIT) {
+                if(session.getTransaction().isActive())
+                    session.getTransaction().rollback();
+                throw new CostManagementException("Action failed",
+                        new Throwable("The transaction was not committed"));
             }
+
+            if(totalIncomeList.isEmpty())
+                throw new CostManagementException("The selected month is invalid",
+                        new Throwable("No spends recorded for this month"));
+
+            else{
+                totalIncome = totalIncomeList.get(0);
+                income = totalIncome.getAmountIncome();
+            }
+
+            System.out.println(" Costs for month " + month + ":\n Spend amount: " +spend + "\n Income amount: " + income
+                    + "\n Total: " + total);
         }
 
         catch (HibernateException e){
@@ -375,14 +456,68 @@ public class CostManagementDAO implements IIncomingDAO,
         }
 
         finally {
-            spend = 0;
-           if(session!=null)
+            if(session!=null)
                 session.close();
         }
+
+        return income;
     }
 
     @Override
     public double getTotalSpendByMonth(int id, int month) throws CostManagementException {
+        spend = 0;
+
+        if(!session.isOpen()){
+            session = factory.openSession();
+            session.beginTransaction();
+        }
+
+        try{
+            hql = session.createQuery("from TotalSpend where month = :month and id = :id");
+            hql.setParameter("month", month).setParameter("id",id);
+            List<TotalSpend> totalSpendList = hql.list();
+
+
+            if(session.getTransaction().getStatus() == TransactionStatus.FAILED_COMMIT) {
+                if(session.getTransaction().isActive())
+                    session.getTransaction().rollback();
+                throw new CostManagementException("Action failed",
+                        new Throwable("The transaction was not committed"));
+            }
+
+            if(totalSpendList.isEmpty())
+                throw new CostManagementException("The selected month is invalid",
+                        new Throwable("No spends recorded for this month"));
+
+            else{
+                totalSpend = totalSpendList.get(0);
+                spend = totalSpend.getAmountSpend();
+            }
+
+            System.out.println(" Costs for month " + month + ":\n Spend amount: " +spend + "\n Income amount: " + income
+                    + "\n Total: " + total);
+        }
+
+        catch (HibernateException e){
+            if(session.getTransaction().isActive())
+                session.getTransaction().rollback();
+            throw new CostManagementException(e.getMessage());
+        }
+
+        finally {
+            if(session!=null)
+                session.close();
+        }
+
+        return spend;
+    }
+
+    @Override
+    public double getTotalAmountByMonth(int id, int month) throws CostManagementException {
+
+        spend = 0;
+        income = 0;
+        total = 0;
 
         if(!session.isOpen()){
             session = factory.openSession();
@@ -410,7 +545,7 @@ public class CostManagementDAO implements IIncomingDAO,
                 totalSpend = totalSpendList.get(0);
                 spend = totalSpend.getAmountSpend();
                 income = totalSpend.getAmountIncome();
-                total = income - spend;
+                total = Math.abs(income + spend);
             }
 
             System.out.println(" Costs for month " + month + ":\n Spend amount: " +spend + "\n Income amount: " + income
@@ -426,9 +561,6 @@ public class CostManagementDAO implements IIncomingDAO,
         finally {
             if(session!=null)
                 session.close();
-            spend = 0;
-            income = 0;
-            total = 0;
         }
 
         return total;
@@ -501,7 +633,7 @@ public class CostManagementDAO implements IIncomingDAO,
 
         try {
             transactionId = spend.getId();
-           // session.beginTransaction();
+            session.beginTransaction();
             hql = session.createQuery("from TotalSpend where month = :month and id = :id");
             hql.setParameter("month", month).setParameter("id", transactionId);
             List<TotalSpend> totalSpendList = hql.list();
@@ -561,7 +693,7 @@ public class CostManagementDAO implements IIncomingDAO,
 
         try {
             transactionId = incoming.getId();
-            // session.beginTransaction();
+             session.beginTransaction();
             hql = session.createQuery("from TotalSpend where month = :month and id = :id");
             hql.setParameter("month", month).setParameter("id", transactionId);
             List<TotalSpend> totalSpendList = hql.list();
