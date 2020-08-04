@@ -13,16 +13,16 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <%!
-    private String userNameCookie = null;
+ /*   private String userNameCookie = null;
     private String passwordCookie = null;
     boolean isLoginSucceed;
-    IUserDAO dao = CostManagementDAO.getInstance();
+    IUserDAO dao = CostManagementDAO.getInstance();*/
 %>
 
 <%
 
 
-    getCookies(request);
+   /* getCookies(request);
 
     System.out.println("user: " + userNameCookie );
     System.out.println("password: " + passwordCookie );
@@ -40,26 +40,26 @@
              //  response.sendRedirect("home.jsp");
               // response.sendRedirect("home.jsp");
               // session.setAttribute("currentUser",user);
-             /*  request.getRequestDispatcher("graphs.jsp").forward(request, response);
+             *//*  request.getRequestDispatcher("graphs.jsp").forward(request, response);
                response.sendRedirect("graphs.jsp");
                out.println("<script type='text/javascript'>");
                RequestDispatcher dispatcher = request.getRequestDispatcher("function.js");
                dispatcher.forward(request,response);
                response.sendRedirect("function.js");
-               out.println("</script>");*/
+               out.println("</script>");*//*
 
            }
         } catch (CostManagementException e) {
             e.printStackTrace();
         }
-    }
+    }*/
 %>
 
 
 
 <%!
 
-    private void getCookies(HttpServletRequest request) {
+ /*   private void getCookies(HttpServletRequest request) {
 
         Cookie[] cookies = request.getCookies();
 
@@ -73,7 +73,7 @@
             }
         }
 
-    }
+    }*/
 %>
 
 

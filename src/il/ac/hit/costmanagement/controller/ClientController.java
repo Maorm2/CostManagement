@@ -22,7 +22,11 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.util.Calendar;
 
-
+/**
+ * This class extends Abstract controller.
+ * A new request that come from the RouterServlet
+ * is redirect to RESTful web service.
+ */
 public class ClientController extends AbstractController {
 
     private  LocalDate date = new java.sql.Date(Calendar.getInstance().getTimeInMillis()).toLocalDate();
@@ -66,9 +70,9 @@ public class ClientController extends AbstractController {
     private double novemberSpend = 0;
     private double decemberSpend = 0;
 
-    private  double[] monthsSpend = {januarySpend,februarySpend,marchSpend,aprilSpend,
+  /*  private  double[] monthsSpend = {januarySpend,februarySpend,marchSpend,aprilSpend,
             maySpend,juneSpend,julySpend,augustSpend,septemberSpend,octoberSpend,
-            novemberSpend,decemberSpend};
+            novemberSpend,decemberSpend};*/
 
 
     private double januaryIncome = 0;
@@ -83,10 +87,10 @@ public class ClientController extends AbstractController {
     private double octoberIncome = 0;
     private double novemberIncome = 0;
     private  double decemberIncome = 0;
-
+/*
     private double[] monthIncome = {januaryIncome,februaryIncome,marchIncome,aprilIncome,
             mayIncome,juneIncome,julyIncome,augustIncome,septemberIncome,octoberIncome,
-            novemberIncome,decemberIncome};
+            novemberIncome,decemberIncome};*/
 
     private double totalIncomeForMonth = 0;
     private double totalSpendForMonth = 0;
@@ -94,10 +98,18 @@ public class ClientController extends AbstractController {
     private  double incomePercent = 0;
     private  double spendPercent = 0;
 
+    /**
+     * Checks the authentication and query the income and spend from db.
+     * @param request an object that represent the request
+     * @param response and object that represent the response
+     * @throws IOException
+     * @throws ServletException
+     */
     public void login(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
         String email = request.getParameter("email");
         String password = request.getParameter("password");
+
 
         try {
             // Create a new JSON object to check the authentication
@@ -129,36 +141,32 @@ public class ClientController extends AbstractController {
 
                 request.getSession().setAttribute("currentUser", user);
 
-
-
-                getSpendByMonth();
-                getIncomeByMonth();
-                getTotalAmountByMonth();
-
-
-
                 spend.put("currentUser",user);
+                spend.put("month",month);
 
                 spend = new HomeService().getSpendForMonth(spend);
                 spendForMonth = (double) spend.get("spendForMonth");
                 request.getSession().setAttribute("spendForMonth",spendForMonth);
 
                 income.put("currentUser",user);
+                income.put("month",month);
 
                 income = new HomeService().getIncomeForMonth(income);
                 incomeForMonth = (double) income.get("incomeForMonth");
                 request.getSession().setAttribute("incomeForMonth",incomeForMonth);
 
                 total.put("currentUser",user);
+                total.put("month",month);
 
                 total = new HomeService().getTotalAmount(total);
                 totalAmountForMonth = (double) total.get("totalAmountForMonth");
                 request.getSession().setAttribute("totalAmountForMonth",totalAmountForMonth);
 
 
-                request.getRequestDispatcher("home.jsp").forward(request, response);
+               request.getRequestDispatcher("home.jsp").forward(request, response);
 
             }
+
 
         } catch (CostManagementException e) {
             request.setAttribute("error",e.getMessage());
@@ -168,6 +176,13 @@ public class ClientController extends AbstractController {
     }
 
 
+    /**
+     * Register a new user
+     * @param request an object that represent the request
+     * @param response and object that represent the response
+     * @throws IOException
+     * @throws ServletException
+     */
     public void register(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
         try {
@@ -200,6 +215,15 @@ public class ClientController extends AbstractController {
 
     }
 
+
+    /**
+     * Add a new spend to the currently month
+     * @param request an object that represent the request
+     * @param response and object that represent the response
+     * @throws ServletException
+     * @throws IOException
+     * @throws CostManagementException
+     */
     public void addspend(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, CostManagementException {
 
         try {
@@ -225,10 +249,7 @@ public class ClientController extends AbstractController {
                 throw new CostManagementException(responseFromRest);
             }
 
-            System.out.println("URI: " + request.getRequestURI());
-            System.out.println("PATH: " + request.getContextPath());
              request.getRequestDispatcher("/home.jsp").include(request, response);
-            System.out.println("URI: " + request.getRequestURI());
         }
         catch (CostManagementException e){
             request.setAttribute("error",e.getMessage());
@@ -240,6 +261,13 @@ public class ClientController extends AbstractController {
 
     }
 
+    /**
+     * Add a new income to the currently month
+     * @param request an object that represent the request
+     * @param response and object that represent the response
+     * @throws ServletException
+     * @throws IOException
+     */
     public void addincome(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         try {
@@ -264,10 +292,8 @@ public class ClientController extends AbstractController {
                 throw new CostManagementException(responseFromRest);
             }
 
-            System.out.println("URI: " + request.getRequestURI());
-            System.out.println("PATH: " + request.getContextPath());
             request.getRequestDispatcher("/home.jsp").include(request, response);
-            System.out.println("URI: " + request.getRequestURI());
+
         }
         catch (CostManagementException e){
             request.setAttribute("error",e.getMessage());
@@ -279,15 +305,23 @@ public class ClientController extends AbstractController {
 
 
     }
-        // Getting all the spend amount by category
+
+    /**
+     * Getting all the categories that spend of the currently month
+     * @param request an object that represent the request
+     *  @param response and object that represent the response
+     * @throws ServletException
+     * @throws IOException
+     */
     public void categories(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
              user = (User) request.getSession().getAttribute("currentUser");
 
         try {
-            System.out.println("Arrive categories controller");
-            getAllCategories();
-            System.out.println("user controller: " + user.toString());
+
+            //getAllCategories();
+
+            categories.put("month",month);
             categories.put("currentUser", user);
 
             categories = new HomeService().getAllCategories(categories);
@@ -318,8 +352,6 @@ public class ClientController extends AbstractController {
             request.getSession().setAttribute("government", government);
             request.getSession().setAttribute("food", food);
 
-
-
             request.getRequestDispatcher("/categories.jsp").include(request, response);
 
         }
@@ -332,14 +364,21 @@ public class ClientController extends AbstractController {
     }
 
 
-
+    /**
+     * Getting all the costs of the current year to make a graph of the year
+     * and getting all the costs of the currently month
+     * @param request an object that represent the request
+     * @param response and object that represent the response
+     * @throws ServletException
+     * @throws IOException
+     */
     public void graphs(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         try{
             user = (User) request.getSession().getAttribute("currentUser");
 
-            getAllYearCosts();
-
+            graphs.put("currentUser",user);
+            graphs.put("month",month);
 
             graphs = new HomeService().getAllYearCosts(graphs);
 
@@ -348,7 +387,6 @@ public class ClientController extends AbstractController {
             if(responseFromRest.equals("ERROR")){
                 throw new CostManagementException(responseFromRest);
             }
-
 
 
              januarySpend =  (double)graphs.get("januarySpend");
@@ -383,39 +421,49 @@ public class ClientController extends AbstractController {
 
             totalAllCosts = totalIncomeForMonth + totalSpendForMonth;
 
+            request.getSession().setAttribute("januarySpend",januarySpend);
+            request.getSession().setAttribute("februarySpend",februarySpend);
+            request.getSession().setAttribute("marchSpend",marchSpend);
+            request.getSession().setAttribute("aprilSpend",aprilSpend);
+            request.getSession().setAttribute("maySpend",maySpend);
+            request.getSession().setAttribute("juneSpend",juneSpend);
+            request.getSession().setAttribute("julySpend",julySpend);
+            request.getSession().setAttribute("augustSpend",augustSpend);
+            request.getSession().setAttribute("septemberSpend",septemberSpend);
+            request.getSession().setAttribute("octoberSpend",octoberSpend);
+            request.getSession().setAttribute("novemberSpend",novemberSpend);
+            request.getSession().setAttribute("decemberSpend",decemberSpend);
 
-          /*  costsForAllYears.get("januarySpend");
-            costsForAllYears.get("januarySpend");
-            costsForAllYears.get("januarySpend");
-            costsForAllYears.get("januarySpend");
-            costsForAllYears.get("januarySpend");
-            costsForAllYears.get("januarySpend");
-            costsForAllYears.get("januarySpend");
-            costsForAllYears.get("januarySpend");
+            request.getSession().setAttribute("totalSpendForMonth",totalSpendForMonth);
 
 
-            costsForAllYears.get("januarySpend");
-            costsForAllYears.get("januarySpend");
-            costsForAllYears.get("januarySpend");
-            costsForAllYears.get("januarySpend");
-            costsForAllYears.get("januarySpend");
-            costsForAllYears.get("januarySpend");
-            costsForAllYears.get("januarySpend");
-            costsForAllYears.get("januarySpend");
-            costsForAllYears.get("januarySpend");
-            costsForAllYears.get("januarySpend");
-            costsForAllYears.get("januarySpend");
-            costsForAllYears.get("januarySpend");*/
+            request.getSession().setAttribute("januaryIncome",januaryIncome);
+            request.getSession().setAttribute("februaryIncome",februaryIncome);
+            request.getSession().setAttribute("marchIncome",marchIncome);
+            request.getSession().setAttribute("aprilIncome",aprilIncome);
+            request.getSession().setAttribute("mayIncome",mayIncome);
+            request.getSession().setAttribute("juneIncome",juneIncome);
+            request.getSession().setAttribute("julyIncome",julyIncome);
+            request.getSession().setAttribute("augustIncome",augustIncome);
+            request.getSession().setAttribute("septemberIncome",septemberIncome);
+            request.getSession().setAttribute("octoberIncome",octoberIncome);
+            request.getSession().setAttribute("novemberIncome",novemberIncome);
+            request.getSession().setAttribute("decemberIncome",decemberIncome);
 
+            request.getSession().setAttribute("totalIncomeForMonth",totalIncomeForMonth);
+
+            request.getSession().setAttribute("totalAllCosts",totalAllCosts);
 
             incomePercent = calculatePercentage(totalIncomeForMonth,totalAllCosts);
             spendPercent = calculatePercentage(totalSpendForMonth,totalAllCosts);
 
-            System.out.println("income per: " + incomePercent);
-            System.out.println("cost per: " + spendPercent);
-
             incomePercent = Math.floor(incomePercent * 10) / 10;
             spendPercent = Math.floor(spendPercent * 10) / 10;
+
+            request.getSession().setAttribute("incomePercent",incomePercent);
+            request.getSession().setAttribute("spendPercent",spendPercent);
+
+            request.getRequestDispatcher("/graphs.jsp").include(request, response);
 
         }
 
@@ -427,104 +475,62 @@ public class ClientController extends AbstractController {
 
     }
 
+    /**
+     * logout the current user and invalidate his session and erase the cookies
+     * @param request an object that represent the request
+     * @param response and object that represent the response
+     * @throws ServletException
+     * @throws IOException
+     */
+    public void logout(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.getSession().invalidate();
+        eraseCookies(request,response);
+        request.getRequestDispatcher("/logout.jsp").include(request, response);
+    }
+
+    /**
+     * This function erases the cookies from the current user
+     * @param req an object that represent the request
+     * @param resp and object that represent the response
+     */
+    private void eraseCookies(HttpServletRequest req, HttpServletResponse resp) {
+        Cookie[] cookies = req.getCookies();
+        if (cookies != null)
+            for (Cookie cookie : cookies) {
+                cookie.setValue("");
+                cookie.setPath("/");
+                cookie.setMaxAge(0);
+                resp.addCookie(cookie);
+            }
+    }
 
 
-
+    /**
+     * This function add cookies 'userName' and 'password' for the user
+     * for an automatic login
+     * @param response an object that represent the response
+     * @param userName an object the represent the user name of the user
+     * @param password an object the represent the password of the user
+     */
     private void addCookies(HttpServletResponse response,String userName,String password) {
 
         javax.servlet.http.Cookie userNameCookie = new javax.servlet.http.Cookie("userName",userName);
         javax.servlet.http.Cookie passwordCookie = new Cookie("password", password);
         response.addCookie(userNameCookie);
         response.addCookie(passwordCookie);
-
     }
 
-    private void getAllYearCosts() throws CostManagementException {
 
-        graphs.put("januarySpend",januarySpend);
-        graphs.put("februarySpend",februarySpend);
-        graphs.put("marchSpend",marchSpend);
-        graphs.put("aprilSpend",aprilSpend);
-        graphs.put("maySpend",maySpend);
-        graphs.put("juneSpend",juneSpend);
-        graphs.put("julySpend",julySpend);
-        graphs.put("augustSpend",augustSpend);
-        graphs.put("septemberSpend",septemberSpend);
-        graphs.put("octoberSpend",octoberSpend);
-        graphs.put("novemberSpend",novemberSpend);
-        graphs.put("decemberSpend",decemberSpend);
-
-        graphs.put("totalSpendForMonth",totalSpendForMonth);
-
-        graphs.put("januaryIncome",januaryIncome);
-        graphs.put("februaryIncome",februaryIncome);
-        graphs.put("marchIncome",marchIncome);
-        graphs.put("aprilIncome",aprilIncome);
-        graphs.put("mayIncome",mayIncome);
-        graphs.put("juneIncome",juneIncome);
-        graphs.put("julyIncome",julyIncome);
-        graphs.put("augustIncome",augustIncome);
-        graphs.put("septemberIncome",septemberIncome);
-        graphs.put("octoberIncome",octoberIncome);
-        graphs.put("novemberIncome",novemberIncome);
-        graphs.put("decemberIncome",decemberIncome);
-
-        graphs.put("totalIncomeForMonth",totalIncomeForMonth);
-
-
-        graphs.put("currentUser",user);
-        graphs.put("month",month);
-
-
-      /*  for(int i = 0; i<monthsSpend.length; i++){
-            monthsSpend[i] = spendDAO.getSpendByMonth(user.getId(),i+1);
-            if(i+1==month)
-                totalSpendForMonth = monthsSpend[i];
-        }
-
-
-
-        for(int i = 0; i<monthIncome.length; i++){
-            monthIncome[i] = incomingDAO.getIncomeByMonth(user.getId(),i+1);
-            if(i+1==month)
-                totalIncomeForMonth = monthIncome[i];
-        }
-
-        totalAllCosts = Math.abs(totalIncomeForMonth + totalSpendForMonth);*/
-    }
-
+    /**
+     * This function calculate the percentage of the income and spend for the current month
+     * @param obtained the income object or spend object
+     * @param total the total sum of income and spend
+     * @return the percentage of the obtained object
+     */
     public double calculatePercentage(double obtained, double total) {
         return obtained * 100 / total;
     }
 
-    private void getTotalAmountByMonth() throws CostManagementException {
-        total.put("month",month);
 
-    }
-
-    private void getIncomeByMonth() throws CostManagementException {
-        income.put("month",month);
-
-    }
-
-    private void getSpendByMonth() throws CostManagementException {
-        spend.put("month", month);
-    }
-
-    public void getAllCategories() throws CostManagementException {
-
-        categories.put("Shopping",shopping);
-        categories.put("Transport",transport);
-        categories.put("Restaurant",restaurant);
-        categories.put("Health",health);
-        categories.put("Family",family);
-        categories.put("Groceries",groceries);
-        categories.put("Leisure",leisure);
-        categories.put("Government",government);
-        categories.put("Food",food);
-
-        categories.put("user",user);
-
-    }
 }
 

@@ -6,6 +6,8 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+
+
 <html>
 
 
@@ -30,25 +32,36 @@
                         <form  action="addspend" method="get">
 
                             <div class="form-group row">
-                                <label for="amount" class="col-md-4 col-form-label text-md-right">Amount</label>
+                                <label for="amount" class="col-md-4 col-form-label text-md-left">Amount</label>
                                 <div class="col-sm-8">
                                     <input type="number" id="amount" class="form-control" name="amount" required>
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label for="category" class="col-md-4 col-form-label text-md-right">Category</label>
-                                <div class="col-sm-8">
-                                    <input type="text" id="category" class="form-control" name="category" required>
-                                </div>
+                                <label for="amount" class="col-md-4 col-form-label text-md-left">Category</label>
+                                <select name="category" class=" col-sm-6 form-control">
+                                    <option value="">Select Option</option>
+                                    <option value="Shopping">Shopping</option>
+                                    <option value="Transport">Transport</option>
+                                    <option value="Restaurant">Restaurant</option>
+                                    <option value="Health">Health</option>
+                                    <option value="Family">Family</option>
+                                    <option value="Groceries">Groceries</option>
+                                    <option value="Leisure">Leisure</option>
+                                    <option value="Government">Government</option>
+                                    <option value="Food">Food</option>
+                                </select>
                             </div>
                             <div class="form-group row">
-                                <label for="amount" class="col-md-4 col-form-label text-md-right">Permanent spend?</label>
-                                <div class="col-sm-8">
-                                    <input type="checkbox" id="permanentspend" class="form-control" name="permanentspend" required>
-                                </div>
+                                <label for="amount" class="col-md-4 col-form-label text-md-left">Permanent spend?</label>
+                                <select name="permanentspend" class=" col-sm-6 form-control">
+                                    <option value="">Select Option</option>
+                                    <option value="true">Yes</option>
+                                    <option value="false">No</option>
+                                </select>
                             </div>
                             <div class="form-group row">
-                                <label for="category" class="col-md-4 col-form-label text-md-right">Comment</label>
+                                <label for="comment" class="col-md-4 col-form-label text-md-left">Comment</label>
                                 <div class="col-sm-8">
                                     <input type="text" id="comment" class="form-control" name="comment" required autofocus>
                                 </div>
@@ -68,3 +81,4 @@
 </main>
 </body>
 </html>
+

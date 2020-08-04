@@ -34,10 +34,12 @@
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label for="amount" class="col-md-4 col-form-label text-md-right">Permanent income?</label>
-                                <div class="col-sm-8">
-                                    <input type="checkbox" id="permanentincome" class="form-control" name="permanentincome" required>
-                                </div>
+                                <label for="amount" class="col-md-4 col-form-label text-md-left">Permanent income?</label>
+                                <select name="permanentincome" class=" col-sm-6 form-control">
+                                    <option value="">Select Option</option>
+                                    <option value="true">Yes</option>
+                                    <option value="false">No</option>
+                                </select>
                             </div>
                             <div class="form-group row">
                                 <label for="amount" class="col-md-4 col-form-label text-md-right">Comment</label>

@@ -17,7 +17,10 @@
     private ISpendDAO spendDAO = CostManagementDAO.getInstance();
     private IIncomingDAO incomingDAO = CostManagementDAO.getInstance();
     private User user;
-   /* private int month = new Date(Calendar.getInstance().getTimeInMillis()).toLocalDate().getMonth().getValue();
+
+
+
+    private int month = new Date(Calendar.getInstance().getTimeInMillis()).toLocalDate().getMonth().getValue();
 
 
     private double januarySpend = 0;
@@ -33,9 +36,9 @@
     private double novemberSpend = 0;
     private double decemberSpend = 0;
 
-    double[] monthsSpend = {januarySpend,februarySpend,marchSpend,aprilSpend,
+   /* double[] monthsSpend = {januarySpend,februarySpend,marchSpend,aprilSpend,
             maySpend,juneSpend,julySpend,augustSpend,septemberSpend,octoberSpend,
-            novemberSpend,decemberSpend};
+            novemberSpend,decemberSpend};*/
 
 
     double januaryIncome = 0;
@@ -51,22 +54,73 @@
     double novemberIncome = 0;
     double decemberIncome = 0;
 
-    double[] monthIncome = {januaryIncome,februaryIncome,marchIncome,aprilIncome,
+/*    double[] monthIncome = {januaryIncome,februaryIncome,marchIncome,aprilIncome,
             mayIncome,juneIncome,julyIncome,augustIncome,septemberIncome,octoberIncome,
-            novemberIncome,decemberIncome};
+            novemberIncome,decemberIncome};*/
 
     double totalIncomeForMonth = 0;
     double totalSpendForMonth = 0;
     double totalAllCosts = 0;
     double incomePercent = 0;
-    double spendPercent = 0;*/
+    double spendPercent = 0;
 
 %>
 
 <%
-    user = (User)request.getAttribute("currentUser");
+    //user = (User)request.getAttribute("currentUser");
 
-    try {
+
+    januarySpend = (double)request.getSession().getAttribute("januarySpend");
+    februarySpend = (double) request.getSession().getAttribute("februarySpend");
+    marchSpend = (double)request.getSession().getAttribute("marchSpend");
+    aprilSpend = (double) request.getSession().getAttribute("aprilSpend");
+    maySpend = (double)request.getSession().getAttribute("maySpend");
+    juneSpend = (double) request.getSession().getAttribute("juneSpend");
+    julySpend = (double) request.getSession().getAttribute("julySpend");
+    augustSpend = (double) request.getSession().getAttribute("augustSpend");
+    septemberSpend = (double) request.getSession().getAttribute("septemberSpend");
+    octoberSpend = (double) request.getSession().getAttribute("octoberSpend");
+    novemberSpend = (double) request.getSession().getAttribute("novemberSpend");
+    decemberSpend = (double) request.getSession().getAttribute("decemberSpend");
+
+    totalSpendForMonth = (double) request.getSession().getAttribute("totalSpendForMonth");
+
+
+
+    januaryIncome = (double)request.getSession().getAttribute("januaryIncome");
+    februaryIncome = (double) request.getSession().getAttribute("februaryIncome");
+    marchIncome = (double)request.getSession().getAttribute("marchIncome");
+    aprilIncome = (double) request.getSession().getAttribute("aprilIncome");
+    mayIncome = (double)request.getSession().getAttribute("mayIncome");
+    juneIncome = (double) request.getSession().getAttribute("juneIncome");
+    julyIncome = (double) request.getSession().getAttribute("julyIncome");
+    augustIncome = (double) request.getSession().getAttribute("augustIncome");
+    septemberIncome = (double) request.getSession().getAttribute("septemberIncome");
+    octoberIncome = (double) request.getSession().getAttribute("octoberIncome");
+    novemberIncome = (double) request.getSession().getAttribute("novemberIncome");
+    decemberIncome = (double) request.getSession().getAttribute("decemberIncome");
+
+
+
+    totalIncomeForMonth = (double) request.getSession().getAttribute("totalIncomeForMonth");
+
+
+    totalAllCosts = (double) request.getSession().getAttribute("totalAllCosts");
+
+     incomePercent = (double)request.getSession().getAttribute("incomePercent");
+     spendPercent = (double)request.getSession().getAttribute("spendPercent");
+
+
+
+
+    System.out.println("income: " + julyIncome);
+    System.out.println("income: " + augustIncome);
+    System.out.println("income: " + septemberIncome);
+
+
+
+
+   /* try {
         getAllYearCosts();
         incomePercent = calculatePercentage(totalIncomeForMonth,totalAllCosts);
         spendPercent = calculatePercentage(totalSpendForMonth,totalAllCosts);
@@ -82,14 +136,14 @@
 
     } catch (CostManagementException e) {
         e.printStackTrace();
-    }
+    }*/
 %>
 
 
 
 
 
-
+<%--
 <html>
 <head>
 
@@ -131,7 +185,7 @@
 <body>
 <div id="piechart" style="width: 900px; height: 500px;"></div>
 </body>
-</html>
+</html>--%>
 
 
 <html>
@@ -145,18 +199,18 @@
         function drawChart() {
             var data = google.visualization.arrayToDataTable([
                 ['Month', 'Incoming', 'Spend'],
-                ['January',  <%=monthIncome[0]%>,      <%=monthsSpend[0]%>],
-                ['February',  <%=monthIncome[1]%>,      <%=monthsSpend[1]%>],
-                ['March',  <%=monthIncome[2]%>,       <%=monthsSpend[2]%>],
-                ['April',  <%=monthIncome[3]%>,      <%=monthsSpend[3]%>],
-                ['May',  <%=monthIncome[4]%>,       <%=monthsSpend[4]%>],
-                ['June',  <%=monthIncome[5]%>,       <%=monthsSpend[5]%>],
-                ['July',  <%=monthIncome[6]%>,       <%=monthsSpend[6]%>],
-                ['August',  <%=monthIncome[7]%>,       <%=monthsSpend[7]%>],
-                ['September',  <%=monthIncome[8]%>,       <%=monthsSpend[8]%>],
-                ['October',  <%=monthIncome[9]%>,       <%=monthsSpend[9]%>],
-                ['November',  <%=monthIncome[10]%>,       <%=monthsSpend[10]%>],
-                ['December',  <%=monthIncome[11]%>,       <%=monthsSpend[11]%>],
+                ['January',  <%=januaryIncome%>,      <%=januarySpend%>],
+                ['February',  <%=februaryIncome%>,      <%=februarySpend%>],
+                ['March',  <%=marchIncome%>,       <%=marchSpend%>],
+                ['April',  <%=aprilIncome%>,      <%=aprilSpend%>],
+                ['May',  <%=mayIncome%>,       <%=maySpend%>],
+                ['June',  <%=juneIncome%>,       <%=juneSpend%>],
+                ['July',  <%=julyIncome%>,       <%=julySpend%>],
+                ['August',  <%=augustIncome%>,       <%=augustSpend%>],
+                ['September',  <%=septemberIncome%>,       <%=septemberSpend%>],
+                ['October',  <%=octoberIncome%>,       <%=octoberSpend%>],
+                ['November',  <%=novemberIncome%>,       <%=novemberSpend%>],
+                ['December',  <%=decemberIncome%>,       <%=decemberSpend%>],
             ]);
 
             var options = {
@@ -238,7 +292,7 @@
 
 
 <%!
-    private void getAllYearCosts() throws CostManagementException {
+ /*   private void getAllYearCosts() throws CostManagementException {
         System.out.println("user: " + user.toString());
 
        for(int i = 0; i<monthsSpend.length; i++){
@@ -261,7 +315,7 @@
 
         public double calculatePercentage(double obtained, double total) {
             return obtained * 100 / total;
-        }
+        }*/
 
 
 %>

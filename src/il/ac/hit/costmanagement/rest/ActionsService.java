@@ -1,8 +1,8 @@
+
 package il.ac.hit.costmanagement.rest;
 
 import il.ac.hit.costmanagement.dm.Incoming;
 import il.ac.hit.costmanagement.dm.Spend;
-import il.ac.hit.costmanagement.dm.User;
 import il.ac.hit.costmanagement.exception.CostManagementException;
 import il.ac.hit.costmanagement.model.CostManagementDAO;
 import il.ac.hit.costmanagement.model.IIncomingDAO;
@@ -12,13 +12,20 @@ import org.json.JSONObject;
 
 import javax.ws.rs.*;
 
+@Path("/actions")
 public class ActionsService {
 
     ISpendDAO spendDAO = CostManagementDAO.getInstance();
     IIncomingDAO incomingDAO = CostManagementDAO.getInstance();
 
+
+    /**
+     * Adding a new spend
+     * @param newSpend an object that represent the new spend
+     * @return JSON object response if the action succeed or not
+     */
     @POST
-    @Path("/addSpend")
+    @Path("/addspend")
     @Produces("text/html")
     @Consumes({"application/json"})
     public JSONObject addSpend(JSONObject newSpend) {
@@ -35,8 +42,13 @@ public class ActionsService {
         }
     }
 
+    /**
+     * Adding a new income
+     * @param newIncome an object the represent the new income
+     * @return JSON object response if the action succeed or not
+     */
     @POST
-    @Path("/addIncome")
+    @Path("/addincome")
     @Produces("text/html")
     @Consumes({"application/json"})
     public JSONObject addIncome(JSONObject newIncome) {

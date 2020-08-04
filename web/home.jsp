@@ -130,7 +130,7 @@
                             <a class="nav-link" href="addspend.jsp">Add spend</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="login.jsp">Logout</a>
+                            <a class="nav-link" href="${pageContext.request.contextPath}/logout">Logout</a>
                         </li>
 
                     </ul>

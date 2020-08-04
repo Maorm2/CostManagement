@@ -158,7 +158,7 @@
                         size : 180,
                         thickness: 5,
                         fill: {
-                            color: '#663399',
+                            color: '#FA6800',
                         }
                     }).on('circle-animation-progress', function (event, progress, stepValue) {
                         $(this).find('strong').text((stepValue*<%=totalAmount%>).toFixed(0) + "$");

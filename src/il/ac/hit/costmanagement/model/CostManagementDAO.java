@@ -383,12 +383,10 @@ public class CostManagementDAO implements IIncomingDAO,
                     System.out.println("TransAction id: " + spendTable.getTransactionId());
                     if (month == spendTable.getDate().toLocalDate().getMonth().getValue()) {
                         spend = spend + spendTable.getAmount();
-                        System.out.println("Spend in if: " + spend);
                     }
                     System.out.println("Spend table: " + spendTable);
                     spendTable = iterator.next();
-                    System.out.println("iterator: " + iterator.next().toString());
-                    System.out.println("Spend table: " + spendTable);
+
                 }
                 System.out.println("Spend in model: " + spend);
                 return spend;
@@ -437,15 +435,14 @@ public class CostManagementDAO implements IIncomingDAO,
             }
 
             if(totalIncomeList.isEmpty())
-                throw new CostManagementException("The selected month is invalid",
-                        new Throwable("No spends recorded for this month"));
+                return 0;
 
             else{
                 totalIncome = totalIncomeList.get(0);
                 income = totalIncome.getAmountIncome();
             }
 
-            System.out.println(" Costs for month " + month + ":\n Spend amount: " +spend + "\n Income amount: " + income
+            System.out.println("Costs for month " + month + ":\n Spend amount: " +spend + "\n Income amount: " + income
                     + "\n Total: " + total);
         }
 
@@ -486,8 +483,7 @@ public class CostManagementDAO implements IIncomingDAO,
             }
 
             if(totalSpendList.isEmpty())
-                throw new CostManagementException("The selected month is invalid",
-                        new Throwable("No spends recorded for this month"));
+                return 0;
 
             else{
                 totalSpend = totalSpendList.get(0);

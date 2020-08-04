@@ -3,7 +3,6 @@ package il.ac.hit.costmanagement.rest;
 import il.ac.hit.costmanagement.dm.User;
 import il.ac.hit.costmanagement.exception.CostManagementException;
 import il.ac.hit.costmanagement.model.CostManagementDAO;
-import il.ac.hit.costmanagement.model.IIncomingDAO;
 import il.ac.hit.costmanagement.model.ISpendDAO;
 import il.ac.hit.costmanagement.model.ITotalSpend;
 import org.json.JSONObject;
@@ -11,22 +10,26 @@ import org.json.JSONObject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 
+
+@Path("/home")
 public class HomeService {
 
-    IIncomingDAO dao = CostManagementDAO.getInstance();
     ISpendDAO spendDAO = CostManagementDAO.getInstance();
     ITotalSpend totalSpendDAO = CostManagementDAO.getInstance();
 
+    /**
+     * Getting all the costs of the current year
+     * @param response JSON object that represent data from request and the data of response
+     * @return JSON object that represent the costs of each month of the currently year
+     */
     @GET
+    @Path("/yearcosts")
     @Consumes({"application/json"})
-    public JSONObject getAllYearCosts(JSONObject response) throws CostManagementException {
+    public JSONObject getAllYearCosts(JSONObject response) {
 
         User user = (User) response.get("currentUser");
         int month = (int) response.get("month");
-        ISpendDAO spendDAO = CostManagementDAO.getInstance();
-        IIncomingDAO incomingDAO = CostManagementDAO.getInstance();
 
         double totalSpendForMonth = 0;
         double totalIncomeForMonth = 0;
@@ -50,66 +53,68 @@ public class HomeService {
                 novemberSpend, decemberSpend};
 
 
-            double januaryIncome = 0;
-            double februaryIncome = 0;
-            double marchIncome = 0;
-            double aprilIncome = 0;
-            double mayIncome = 0;
-            double juneIncome = 0;
-            double julyIncome = 0;
-            double augustIncome = 0;
-            double septemberIncome = 0;
-            double octoberIncome = 0;
-            double novemberIncome = 0;
-            double decemberIncome = 0;
+        double januaryIncome = 0;
+        double februaryIncome = 0;
+        double marchIncome = 0;
+        double aprilIncome = 0;
+        double mayIncome = 0;
+        double juneIncome = 0;
+        double julyIncome = 0;
+        double augustIncome = 0;
+        double septemberIncome = 0;
+        double octoberIncome = 0;
+        double novemberIncome = 0;
+        double decemberIncome = 0;
 
-            double[] monthIncome = {januaryIncome, februaryIncome, marchIncome, aprilIncome,
-                    mayIncome, juneIncome, julyIncome, augustIncome, septemberIncome, octoberIncome,
-                    novemberIncome, decemberIncome};
+        double[] monthIncome = {januaryIncome, februaryIncome, marchIncome, aprilIncome,
+                mayIncome, juneIncome, julyIncome, augustIncome, septemberIncome, octoberIncome,
+                novemberIncome, decemberIncome};
 
             try {
 
-                for (int currentMonth = 1; currentMonth <= monthsSpend.length; currentMonth++) {
-                    monthsSpend[currentMonth] = spendDAO.getSpendByMonth(user.getId(), currentMonth);
-                    if (currentMonth == month)
-                        totalSpendForMonth = monthsSpend[currentMonth];
+                for (int i = 0; i < monthsSpend.length; i++) {
+                    monthsSpend[i] = totalSpendDAO.getTotalSpendByMonth(user.getId(), i+1);
+                    if (i+1 == month)
+                        totalSpendForMonth = monthsSpend[i];
                 }
 
 
-                for (int currentMonth = 1; currentMonth <= monthIncome.length; currentMonth++) {
-                    monthIncome[currentMonth] = incomingDAO.getIncomeByMonth(user.getId(), currentMonth);
-                    if (currentMonth == month)
+                for (int currentMonth = 0; currentMonth < monthIncome.length; currentMonth++) {
+                    monthIncome[currentMonth] = totalSpendDAO.getTotalIncomeByMonth(user.getId(), currentMonth+1);
+                    if (currentMonth+1 == month)
                         totalIncomeForMonth = monthIncome[currentMonth];
                 }
 
 
-                response.put("januarySpend", januarySpend);
-                response.put("februarySpend", februarySpend);
-                response.put("marchSpend", marchSpend);
-                response.put("aprilSpend", aprilSpend);
-                response.put("maySpend", maySpend);
-                response.put("juneSpend", juneSpend);
-                response.put("julySpend", julySpend);
-                response.put("augustSpend", augustSpend);
-                response.put("septemberSpend", septemberSpend);
-                response.put("octoberSpend", octoberSpend);
-                response.put("novemberSpend", novemberSpend);
-                response.put("decemberSpend", decemberSpend);
+                response.put("januarySpend",  monthsSpend[0]);
+                response.put("februarySpend", monthsSpend[1]);
+                response.put("marchSpend", monthsSpend[2]);
+                response.put("aprilSpend", monthsSpend[3]);
+                response.put("maySpend", monthsSpend[4]);
+                response.put("juneSpend", monthsSpend[5]);
+                response.put("julySpend", monthsSpend[6]);
+                response.put("augustSpend", monthsSpend[7]);
+                response.put("septemberSpend", monthsSpend[8]);
+                response.put("octoberSpend", monthsSpend[9]);
+                response.put("novemberSpend", monthsSpend[10]);
+                response.put("decemberSpend", monthsSpend[11]);
+
+                response.put("test",augustIncome);
 
                 response.put("totalSpendForMonth", totalSpendForMonth);
 
-                response.put("januaryIncome", januaryIncome);
-                response.put("februaryIncome", februaryIncome);
-                response.put("marchIncome", marchIncome);
-                response.put("aprilIncome", aprilIncome);
-                response.put("mayIncome", mayIncome);
-                response.put("juneIncome", juneIncome);
-                response.put("julyIncome", julyIncome);
-                response.put("augustIncome", augustIncome);
-                response.put("septemberIncome", septemberIncome);
-                response.put("octoberIncome", octoberIncome);
-                response.put("novemberIncome", novemberIncome);
-                response.put("decemberIncome", decemberIncome);
+                response.put("januaryIncome",  monthIncome[0]);
+                response.put("februaryIncome",  monthIncome[1]);
+                response.put("marchIncome",  monthIncome[2]);
+                response.put("aprilIncome",  monthIncome[3]);
+                response.put("mayIncome",  monthIncome[4]);
+                response.put("juneIncome",  monthIncome[5]);
+                response.put("julyIncome",  monthIncome[6]);
+                response.put("augustIncome",  monthIncome[7]);
+                response.put("septemberIncome",  monthIncome[8]);
+                response.put("octoberIncome",  monthIncome[9]);
+                response.put("novemberIncome",  monthIncome[10]);
+                response.put("decemberIncome",  monthIncome[11]);
 
                 response.put("totalIncomeForMonth", totalIncomeForMonth);
 
@@ -118,46 +123,17 @@ public class HomeService {
          catch (CostManagementException e){
                 e.printStackTrace();
                  return response.put("status","ERROR");
-
-
-           /* double januarySpend =  (double)costsForAllYears.get("januarySpend");
-            double februarySpend = (double)costsForAllYears.get("februarySpend");
-            double marchSpend = (double)costsForAllYears.get("marchSpend");
-            double aprilSpend = (double)costsForAllYears.get("aprilSpend");
-            costsForAllYears.get("januarySpend");
-            costsForAllYears.get("januarySpend");
-            costsForAllYears.get("januarySpend");
-            costsForAllYears.get("januarySpend");
-            costsForAllYears.get("januarySpend");
-            costsForAllYears.get("januarySpend");
-            costsForAllYears.get("januarySpend");
-            costsForAllYears.get("januarySpend");
-            costsForAllYears.get("januarySpend");
-
-
-            costsForAllYears.get("januarySpend");
-            costsForAllYears.get("januarySpend");
-            costsForAllYears.get("januarySpend");
-            costsForAllYears.get("januarySpend");
-            costsForAllYears.get("januarySpend");
-            costsForAllYears.get("januarySpend");
-            costsForAllYears.get("januarySpend");
-            costsForAllYears.get("januarySpend");
-            costsForAllYears.get("januarySpend");
-            costsForAllYears.get("januarySpend");
-            costsForAllYears.get("januarySpend");
-            costsForAllYears.get("januarySpend");*/
-            //int month = (Integer)spend.get("month");
-
-            //double spendForMonth = totalSpendDAO.getTotalSpendByMonth(user.getId(),month);
-
-/*        JSONObject totalSpend = new JSONObject();
-        return totalSpend.put("spendForMonth", spendForMonth);*/
         }
 
     }
 
 
+    /**
+     * Getting all the monthly spend per each category
+     * @param categories JSON object that represent the request of all categories
+     * @return the amount spend of each category
+     * @throws CostManagementException
+     */
         @GET
         @Consumes({"application/json"})
         public JSONObject getAllCategories(JSONObject categories) throws CostManagementException {
@@ -194,7 +170,14 @@ public class HomeService {
             }
         }
 
+    /**
+     * Getting spend amount for currently month
+     * @param spend JSON object the represent the current user and the selected month
+     * @return the spend amount of the current month
+     * @throws CostManagementException
+     */
         @GET
+        @Path("/getspendformonth")
         @Consumes({"application/json"})
         public JSONObject getSpendForMonth(JSONObject spend) throws CostManagementException {
 
@@ -207,7 +190,14 @@ public class HomeService {
             return totalSpend.put("spendForMonth", spendForMonth);
         }
 
+    /**
+     * Getting the income amount of the current month
+     * @param income JSON object the represent the current user and the selected month
+     * @return income amount for the current month
+     * @throws CostManagementException
+     */
         @GET
+        @Path("/monthincome")
         @Consumes({"application/json"})
         public JSONObject getIncomeForMonth(JSONObject income) throws CostManagementException {
 
@@ -220,7 +210,14 @@ public class HomeService {
             return totalIncome.put("incomeForMonth", incomeForMonth);
         }
 
+    /**
+     * Getting total costs amount for the current month
+     * @param amount JSON object the represent the current user and selected month
+     * @return total costs amount for the current month
+     * @throws CostManagementException
+     */
         @GET
+        @Path("/totalamount")
         @Consumes({"application/json"})
         public JSONObject getTotalAmount(JSONObject amount) throws CostManagementException {
 
