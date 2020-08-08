@@ -14,14 +14,6 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%!
-    private ISpendDAO spendDAO = CostManagementDAO.getInstance();
-    private IIncomingDAO incomingDAO = CostManagementDAO.getInstance();
-    private User user;
-
-
-
-    private int month = new Date(Calendar.getInstance().getTimeInMillis()).toLocalDate().getMonth().getValue();
-
 
     private double januarySpend = 0;
     private double februarySpend = 0;
@@ -36,11 +28,6 @@
     private double novemberSpend = 0;
     private double decemberSpend = 0;
 
-   /* double[] monthsSpend = {januarySpend,februarySpend,marchSpend,aprilSpend,
-            maySpend,juneSpend,julySpend,augustSpend,septemberSpend,octoberSpend,
-            novemberSpend,decemberSpend};*/
-
-
     double januaryIncome = 0;
     double februaryIncome = 0;
     double marchIncome = 0;
@@ -54,10 +41,6 @@
     double novemberIncome = 0;
     double decemberIncome = 0;
 
-/*    double[] monthIncome = {januaryIncome,februaryIncome,marchIncome,aprilIncome,
-            mayIncome,juneIncome,julyIncome,augustIncome,septemberIncome,octoberIncome,
-            novemberIncome,decemberIncome};*/
-
     double totalIncomeForMonth = 0;
     double totalSpendForMonth = 0;
     double totalAllCosts = 0;
@@ -67,8 +50,6 @@
 %>
 
 <%
-    //user = (User)request.getAttribute("currentUser");
-
 
     januarySpend = (double)request.getSession().getAttribute("januarySpend");
     februarySpend = (double) request.getSession().getAttribute("februarySpend");
@@ -110,83 +91,7 @@
      incomePercent = (double)request.getSession().getAttribute("incomePercent");
      spendPercent = (double)request.getSession().getAttribute("spendPercent");
 
-
-
-
-    System.out.println("income: " + julyIncome);
-    System.out.println("income: " + augustIncome);
-    System.out.println("income: " + septemberIncome);
-
-
-
-
-   /* try {
-        getAllYearCosts();
-        incomePercent = calculatePercentage(totalIncomeForMonth,totalAllCosts);
-        spendPercent = calculatePercentage(totalSpendForMonth,totalAllCosts);
-
-        System.out.println("income per: " + incomePercent);
-        System.out.println("cost per: " + spendPercent);
-
-        incomePercent = Math.floor(incomePercent * 10) / 10;
-        spendPercent = Math.floor(spendPercent * 10) / 10;
-
-        System.out.println("income per: " + incomePercent);
-        System.out.println("cost per: " + spendPercent);
-
-    } catch (CostManagementException e) {
-        e.printStackTrace();
-    }*/
 %>
-
-
-
-
-
-<%--
-<html>
-<head>
-
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript">
-        google.charts.load('current', {'packages':['corechart']});
-        google.charts.setOnLoadCallback(drawChart);
-
-        function drawChart() {
-
-            var data = google.visualization.arrayToDataTable([
-                ['Task', 'Hours per Day'],
-                ['Shopping',     <%=shopping%>],
-                ['Transport',   <%=transport%>],
-                ['Restaurant TV',  <%=restaurant%>],
-                ['Health',    <%=health%>],
-                ['Family',    <%=family%>],
-                ['Groceries',    <%=groceries%>],
-                ['Leisure',    <%=leisure%>],
-                ['Government',    <%=government%>],
-                ['Food',    <%=food%>]
-            ]);
-
-            var options = {
-                title: 'My Monthly costs',
-                is3D : true,
-                backgroundColor: 'transparent'
-            };
-
-
-            var chart = new google.visualization.PieChart(document.getElementById('piechart'));
-
-            chart.draw(data, options);
-
-        }
-    </script>
-    <link rel="stylesheet" href="css/style.css" />
-</head>
-<body>
-<div id="piechart" style="width: 900px; height: 500px;"></div>
-</body>
-</html>--%>
-
 
 <html>
 <head>
@@ -287,38 +192,3 @@
 <script src="function.js"></script>
 </body>
 </html>
-
-
-
-
-<%!
- /*   private void getAllYearCosts() throws CostManagementException {
-        System.out.println("user: " + user.toString());
-
-       for(int i = 0; i<monthsSpend.length; i++){
-           monthsSpend[i] = spendDAO.getSpendByMonth(user.getId(),i+1);
-           if(i+1==month)
-               totalSpendForMonth = monthsSpend[i];
-       }
-
-
-
-        for(int i = 0; i<monthIncome.length; i++){
-            monthIncome[i] = incomingDAO.getIncomeByMonth(user.getId(),i+1);
-            if(i+1==month)
-                totalIncomeForMonth = monthIncome[i];
-        }
-
-        totalAllCosts = Math.abs(totalIncomeForMonth + totalSpendForMonth);
-    }
-
-
-        public double calculatePercentage(double obtained, double total) {
-            return obtained * 100 / total;
-        }*/
-
-
-%>
-
-
-

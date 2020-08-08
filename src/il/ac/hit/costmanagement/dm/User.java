@@ -3,7 +3,7 @@ package il.ac.hit.costmanagement.dm;
 import javax.persistence.Id;
 import java.io.Serializable;
 
-public class User  {
+public class User implements Serializable {
 
     @Id
     private int id;

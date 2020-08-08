@@ -12,10 +12,12 @@ import org.json.*;
 import il.ac.hit.costmanagement.exception.CostManagementException;
 import il.ac.hit.costmanagement.rest.UsersService;
 
+import javax.jws.soap.SOAPBinding;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Date;
@@ -29,6 +31,7 @@ import java.util.Calendar;
  */
 public class ClientController extends AbstractController {
 
+    private final static String ERROR_FROM_RESTFUL = "ERROR";
     private  LocalDate date = new java.sql.Date(Calendar.getInstance().getTimeInMillis()).toLocalDate();
     int month = date.getMonth().getValue();
     private  JSONObject categories = new JSONObject();
@@ -39,9 +42,6 @@ public class ClientController extends AbstractController {
 
     private User user;
 
-    private ISpendDAO spendDAO = CostManagementDAO.getInstance();
-    private IIncomingDAO incomingDAO = CostManagementDAO.getInstance();
-    private ITotalSpend totalSpendDAO =CostManagementDAO.getInstance();
 
     private double shopping = 0;
     private double transport = 0;
@@ -70,10 +70,6 @@ public class ClientController extends AbstractController {
     private double novemberSpend = 0;
     private double decemberSpend = 0;
 
-  /*  private  double[] monthsSpend = {januarySpend,februarySpend,marchSpend,aprilSpend,
-            maySpend,juneSpend,julySpend,augustSpend,septemberSpend,octoberSpend,
-            novemberSpend,decemberSpend};*/
-
 
     private double januaryIncome = 0;
     private double februaryIncome = 0;
@@ -87,10 +83,6 @@ public class ClientController extends AbstractController {
     private double octoberIncome = 0;
     private double novemberIncome = 0;
     private  double decemberIncome = 0;
-/*
-    private double[] monthIncome = {januaryIncome,februaryIncome,marchIncome,aprilIncome,
-            mayIncome,juneIncome,julyIncome,augustIncome,septemberIncome,octoberIncome,
-            novemberIncome,decemberIncome};*/
 
     private double totalIncomeForMonth = 0;
     private double totalSpendForMonth = 0;
@@ -105,74 +97,98 @@ public class ClientController extends AbstractController {
      * @throws IOException
      * @throws ServletException
      */
-    public void login(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    public void login(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException, CostManagementException {
+
+        /*****/
+
+        JSONObject test = new JSONObject();
+        test.put("email","maorytest123@gmail.com");
+        test.put("password","12345");
+
+        Response response1 =  new UsersService().reg(test.toString());
+        JSONObject jsonObject = (JSONObject) response1.getEntity();
+        System.out.println("login controller : " + jsonObject.getString("email") + "pass: " + jsonObject.getString("password"));
+
+
+        /************/
 
         String email = request.getParameter("email");
         String password = request.getParameter("password");
 
 
-        try {
-            // Create a new JSON object to check the authentication
-            // in the RESTful web service
-            JSONObject userAuthentication = new JSONObject();
-            userAuthentication.put("email",email);
-            userAuthentication.put("password",password);
+        // Create a new JSON object to check the authentication
+        // in the RESTful web service
+        JSONObject userAuthentication = new JSONObject();
+        userAuthentication.put("email",email);
+        userAuthentication.put("password",password);
 
-            // Creating a new authentication request and
-            // getting the response from RESTful web service
-            // as a JSON object
-            userAuthentication = new UsersService().checkAuthentication(userAuthentication);
+        // Creating a new authentication request and
+        // getting the response from RESTful web service
+        // as a JSON object
+        userAuthentication = new UsersService().checkAuthentication(userAuthentication.toString());
+        if(userAuthentication.get("status").equals(ERROR_FROM_RESTFUL))
+            response.sendRedirect(request.getContextPath()+"/err.jsp");
 
-            boolean isLoginSucceed = userAuthentication.getBoolean("isLoginSucceed");
+        boolean isLoginSucceed = userAuthentication.getBoolean("isLoginSucceed");
 
-            if (isLoginSucceed) {
-                addCookies(response,email,password);
+        if (isLoginSucceed) {
+            addCookies(response,email,password);
 
-                JSONObject currentUser = new JSONObject();
-                currentUser.put("email",email);
+            JSONObject currentUser = new JSONObject();
+            currentUser.put("email",email);
 
-                // Get the current user that login
-                currentUser = new UsersService().getUser(currentUser);
+            // Get the current user that login
+            currentUser = new UsersService().getUser(currentUser.toString());
 
-                user = (User)currentUser.get("currentUser");
+            if(currentUser.get("status").equals(ERROR_FROM_RESTFUL))
+                response.sendRedirect(request.getContextPath()+"/err.jsp");
 
-                if(user == null)
-                    response.sendRedirect(request.getContextPath()+"/err.jsp");
+            user = (User)currentUser.get("currentUser");
 
-                request.getSession().setAttribute("currentUser", user);
+            if(user == null)
+                response.sendRedirect(request.getContextPath()+"/err.jsp");
 
-                spend.put("currentUser",user);
-                spend.put("month",month);
+            request.getSession().setAttribute("currentUser", user);
 
-                spend = new HomeService().getSpendForMonth(spend);
-                spendForMonth = (double) spend.get("spendForMonth");
-                request.getSession().setAttribute("spendForMonth",spendForMonth);
+            spend.put("currentUser",user);
+            spend.put("month",month);
 
-                income.put("currentUser",user);
-                income.put("month",month);
+            spend = new HomeService().getSpendForMonth(spend);
 
-                income = new HomeService().getIncomeForMonth(income);
-                incomeForMonth = (double) income.get("incomeForMonth");
-                request.getSession().setAttribute("incomeForMonth",incomeForMonth);
+            if(spend.get("status").equals(ERROR_FROM_RESTFUL))
+                response.sendRedirect(request.getContextPath()+"/err.jsp");
 
-                total.put("currentUser",user);
-                total.put("month",month);
+            spendForMonth = (double) spend.get("spendForMonth");
+            request.getSession().setAttribute("spendForMonth",spendForMonth);
 
-                total = new HomeService().getTotalAmount(total);
-                totalAmountForMonth = (double) total.get("totalAmountForMonth");
-                request.getSession().setAttribute("totalAmountForMonth",totalAmountForMonth);
+            income.put("currentUser",user);
+            income.put("month",month);
+
+            income = new HomeService().getIncomeForMonth(income);
+
+            if(income.get("status").equals(ERROR_FROM_RESTFUL))
+                response.sendRedirect(request.getContextPath()+"/err.jsp");
+
+            incomeForMonth = (double) income.get("incomeForMonth");
+            request.getSession().setAttribute("incomeForMonth",incomeForMonth);
+
+            total.put("currentUser",user);
+            total.put("month",month);
+
+            total = new HomeService().getTotalAmount(total);
+
+            if(total.get("status").equals(ERROR_FROM_RESTFUL))
+                response.sendRedirect(request.getContextPath()+"/err.jsp");
+
+            totalAmountForMonth = (double) total.get("totalAmountForMonth");
+            request.getSession().setAttribute("totalAmountForMonth",totalAmountForMonth);
 
 
-               request.getRequestDispatcher("home.jsp").forward(request, response);
+           request.getRequestDispatcher("home.jsp").forward(request, response);
 
-            }
-
-
-        } catch (CostManagementException e) {
-            request.setAttribute("error",e.getMessage());
-            request.getRequestDispatcher("err.jsp").forward(request, response);
-            e.printStackTrace();
         }
+
+
     }
 
 
@@ -189,16 +205,20 @@ public class ClientController extends AbstractController {
             String email = request.getParameter("email");
             String password = request.getParameter("password");
 
-            User user = new User(email, password, 0);
+            //User user = new User(email, password, 0);
 
             // Create a new JSON object to create a new user
             // in the RESTful web service
             JSONObject registerNewUser = new JSONObject();
-            registerNewUser.put("user", user);
+            registerNewUser.put("email", email);
+            registerNewUser.put("password",password);
             // Creating a new register request and
             // getting the response from RESTful web service
             // as a JSON object
-            registerNewUser = new UsersService().registerUser(registerNewUser);
+          //  registerNewUser = new UsersService().registerUser(registerNewUser.toString());
+
+            if(registerNewUser.get("status").equals(ERROR_FROM_RESTFUL))
+                throw new CostManagementException(registerNewUser.getString("errorMessage"));
 
             boolean isRegisterSucceed = registerNewUser.getBoolean("isRegistrationSucceed");
 
@@ -222,31 +242,35 @@ public class ClientController extends AbstractController {
      * @param response and object that represent the response
      * @throws ServletException
      * @throws IOException
-     * @throws CostManagementException
      */
-    public void addspend(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, CostManagementException {
+    public void addspend(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         try {
 
              user = (User) request.getSession().getAttribute("currentUser");
 
             double amount = Double.parseDouble(request.getParameter("amount"));
-            Date date = new Date(Calendar.getInstance().getTimeInMillis());
             String category = request.getParameter("category");
             boolean permanentSpend = Boolean.parseBoolean(request.getParameter("permanentspend"));
             String comment = request.getParameter("comment");
-            int transactionId = 0;
+           // int transactionId = 0;
 
-            Spend spend = new Spend(user.getId(), amount, date, category, permanentSpend, comment, transactionId);
+            //Spend spend = new Spend(user.getId(), amount, date, category, permanentSpend, comment, transactionId);
 
             JSONObject newSpend = new JSONObject();
-            newSpend.put("newSpend", spend);
+           // newSpend.put("newSpend", spend);
+            newSpend.put("userId",user.getId());
+            newSpend.put("amount",amount);
+            newSpend.put("category",category);
+            newSpend.put("permanentSpend",permanentSpend);
+            newSpend.put("comment",comment);
 
-            newSpend = new ActionsService().addSpend(newSpend);
 
-            String responseFromRest =  newSpend.getString("status");
-            if(responseFromRest.equals("ERROR")){
-                throw new CostManagementException(responseFromRest);
+
+            newSpend = new ActionsService().addSpend(newSpend.toString());
+
+            if(newSpend.getString("status").equals(ERROR_FROM_RESTFUL)){
+                throw new CostManagementException(newSpend.getString("errorMessage"));
             }
 
              request.getRequestDispatcher("/home.jsp").include(request, response);
@@ -275,21 +299,25 @@ public class ClientController extends AbstractController {
              user = (User) request.getSession().getAttribute("currentUser");
 
             double amount = Double.parseDouble(request.getParameter("amount"));
-            Date date = new Date(Calendar.getInstance().getTimeInMillis());
+           // Date date = new Date(Calendar.getInstance().getTimeInMillis());
             boolean permanentIncome = Boolean.parseBoolean(request.getParameter("permanentincome"));
             String comment = request.getParameter("comment");
-            int transactionId = 0;
+           // int transactionId = 0;
 
-            Incoming incoming = new Incoming(user.getId(), amount, date, permanentIncome, comment, transactionId);
+           // Incoming incoming = new Incoming(user.getId(), amount, date, permanentIncome, comment, transactionId);
 
             JSONObject newIncome = new JSONObject();
-            newIncome.put("newIncome", incoming);
+            //newIncome.put("newIncome", incoming);
+            newIncome.put("currentUser",user.getId());
+            newIncome.put("amount",amount);
+            newIncome.put("permanentIncome",permanentIncome);
+            newIncome.put("comment",comment);
 
-            newIncome = new ActionsService().addIncome(newIncome);
+            newIncome = new ActionsService().addIncome(newIncome.toString());
 
-            String responseFromRest =  newIncome.getString("status");
-            if(responseFromRest.equals("ERROR")){
-                throw new CostManagementException(responseFromRest);
+
+            if(newIncome.getString("status").equals(ERROR_FROM_RESTFUL)){
+                throw new CostManagementException(newIncome.getString("errorMessage"));
             }
 
             request.getRequestDispatcher("/home.jsp").include(request, response);
@@ -319,16 +347,13 @@ public class ClientController extends AbstractController {
 
         try {
 
-            //getAllCategories();
+           // categories.put("month",month);
+            categories.put("currentUser", user.getId());
 
-            categories.put("month",month);
-            categories.put("currentUser", user);
+            categories = new HomeService().getAllCategories(categories.toString());
 
-            categories = new HomeService().getAllCategories(categories);
-
-            String responseFromRest =  categories.getString("status");
-            if(responseFromRest.equals("ERROR")){
-                throw new CostManagementException(responseFromRest);
+            if(categories.getString("status").equals(ERROR_FROM_RESTFUL)){
+                throw new CostManagementException(categories.getString("errorMessage"));
             }
 
             shopping = (double) categories.get("Shopping");
@@ -377,15 +402,14 @@ public class ClientController extends AbstractController {
         try{
             user = (User) request.getSession().getAttribute("currentUser");
 
-            graphs.put("currentUser",user);
+            graphs.put("currentUser",user.getId());
             graphs.put("month",month);
 
-            graphs = new HomeService().getAllYearCosts(graphs);
+            graphs = new HomeService().getAllYearCosts(graphs.toString());
 
-            String responseFromRest =  graphs.getString("status");
 
-            if(responseFromRest.equals("ERROR")){
-                throw new CostManagementException(responseFromRest);
+            if(graphs.getString("status").equals(ERROR_FROM_RESTFUL)){
+                throw new CostManagementException(graphs.getString("errorMessage"));
             }
 
 
@@ -483,9 +507,12 @@ public class ClientController extends AbstractController {
      * @throws IOException
      */
     public void logout(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.getSession().invalidate();
-        eraseCookies(request,response);
-        request.getRequestDispatcher("/logout.jsp").include(request, response);
+        user = (User) request.getSession().getAttribute("currentUser");
+        if(user != null){
+            request.getSession().invalidate();
+            eraseCookies(request, response);
+            request.getRequestDispatcher("/logout.jsp").include(request, response);
+        }
     }
 
     /**
@@ -502,12 +529,14 @@ public class ClientController extends AbstractController {
                 cookie.setMaxAge(0);
                 resp.addCookie(cookie);
             }
+
+
     }
 
 
     /**
      * This function add cookies 'userName' and 'password' for the user
-     * for an automatic login
+     * for an auto login
      * @param response an object that represent the response
      * @param userName an object the represent the user name of the user
      * @param password an object the represent the password of the user
@@ -530,6 +559,10 @@ public class ClientController extends AbstractController {
     public double calculatePercentage(double obtained, double total) {
         return obtained * 100 / total;
     }
+
+
+
+
 
 
 }

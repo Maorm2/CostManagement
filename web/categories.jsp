@@ -64,16 +64,16 @@
             <div class="progressbar">
                 <div class="first circle" data-percent="<%=shopping%>">
                     <strong></strong>
-                    <span>Shopping</span>
+                    <span style="color:#FA6800">Shopping</span>
                 </div>
             </div>
         </div>
 
         <div class="col-sm-4">
-            <div class="progressbar">
+            <div  class="progressbar">
                 <div class="second circle" data-percent="<%=transport%>">
                     <strong></strong>
-                    <span>Transport</span>
+                    <span style="color:#FA6800">Transport</span>
                 </div>
             </div>
         </div>
@@ -82,15 +82,15 @@
             <div class="progressbar">
                 <div class="second circle" data-percent="<%=restaurant%>">
                     <strong></strong>
-                    <span>Restaurant</span>
+                    <span style="color:#FA6800">Restaurant</span>
                 </div>
             </div>
         </div>
         <div class="col-sm-4">
             <div class="progressbar">
                 <div class="second circle" data-percent="<%=health%>">
-                    <strong></strong>
-                    <span>Health</span>
+                    <strong ></strong>
+                    <span style="color:#FA6800">Health</span>
                 </div>
             </div>
         </div>
@@ -98,7 +98,7 @@
             <div class="progressbar">
                 <div class="second circle" data-percent="<%=family%>">
                     <strong></strong>
-                    <span>Family</span>
+                    <span style="color:#FA6800">Family</span>
                 </div>
             </div>
         </div>
@@ -106,7 +106,7 @@
             <div class="progressbar">
                 <div class="second circle" data-percent="<%=groceries%>">
                     <strong></strong>
-                    <span>Groceries</span>
+                    <span style="color:#FA6800">Groceries</span>
                 </div>
             </div>
         </div>
@@ -114,7 +114,7 @@
             <div class="progressbar">
                 <div class="second circle" data-percent="<%=leisure%>">
                     <strong></strong>
-                    <span>Leisure</span>
+                    <span style="color:#FA6800">Leisure</span>
                 </div>
             </div>
         </div>
@@ -122,7 +122,7 @@
             <div class="progressbar">
                 <div class="second circle" data-percent="<%=government%>">
                     <strong></strong>
-                    <span>Government</span>
+                    <span style="color:#FA6800">Government</span>
                 </div>
             </div>
         </div>
@@ -130,7 +130,7 @@
             <div class="progressbar">
                     <div class="second circle" data-percent="<%=food%>">
                     <strong></strong>
-                    <span>Food</span>
+                    <span style="color:#FA6800">Food</span>
                 </div>
             </div>
         </div>
@@ -150,6 +150,7 @@
                 var topOfWindow = $(window).scrollTop();
                 var percent = $(this).find('.circle').attr('data-percent');
                 var animate = $(this).data('animate');
+                var colors = ["#EA6B66", "#000" , "#fff"]
                 if (elementPos < topOfWindow + $(window).height() - 30 && !animate) {
                     $(this).data('animate', true);
                     $(this).find('.circle').circleProgress({
@@ -158,7 +159,7 @@
                         size : 180,
                         thickness: 5,
                         fill: {
-                            color: '#FA6800',
+                            color: '#EA6B66' ,
                         }
                     }).on('circle-animation-progress', function (event, progress, stepValue) {
                         $(this).find('strong').text((stepValue*<%=totalAmount%>).toFixed(0) + "$");

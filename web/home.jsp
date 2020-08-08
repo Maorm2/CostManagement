@@ -1,10 +1,6 @@
-<%@ page import="java.util.Date" %>
+<%@ page import="java.time.LocalDate" %>
 <%@ page import="java.util.Calendar" %>
 <%@ page import="java.util.GregorianCalendar" %>
-<%@ page import="il.ac.hit.costmanagement.dm.User" %>
-<%@ page import="il.ac.hit.costmanagement.exception.CostManagementException" %>
-<%@ page import="java.time.LocalDate" %>
-<%@ page import="il.ac.hit.costmanagement.model.*" %>
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%!
@@ -16,23 +12,6 @@
     int dayOfMonth = date.getDayOfMonth();
 
 
-    private ISpendDAO spendDAO = CostManagementDAO.getInstance();
-    private IIncomingDAO incomingDAO = CostManagementDAO.getInstance();
-    private ITotalSpend totalSpendDAO =CostManagementDAO.getInstance();
-
-    private User user;
-
-    /*private double shopping = 0;
-    private double transport = 0;
-    private double restaurant = 0;
-    private double health = 0;
-    private  double family = 0;
-    private double groceries = 0;
-    private double leisure = 0;
-    private double government = 0;
-    private  double food = 0;*/
-
-
     double totalForMonth = 0;
     double spendForMonth = 0;
     double incomeForMonth = 0;
@@ -41,50 +20,10 @@
 
 <%
 
-   /* shopping = (double) request.getSession().getAttribute("shopping");
-    transport = (double)request.getSession().getAttribute("transport");
-    restaurant = (double)request.getSession().getAttribute("restaurant");
-    health = (double) request.getSession().getAttribute("health");
-    family = (double) request.getSession().getAttribute("family");
-    groceries = (double)request.getSession().getAttribute("groceries");
-    leisure = (double) request.getSession().getAttribute("leisure");
-    government = (double) request.getSession().getAttribute("government");
-    food = (double) request.getSession().getAttribute("food");*/
-
     spendForMonth = (double) request.getSession().getAttribute("spendForMonth");
     incomeForMonth = (double) request.getSession().getAttribute("incomeForMonth");
     totalForMonth = (double) request.getSession().getAttribute("totalAmountForMonth");
 
-
-
-  /*  //user = (User)request.getAttribute("currentUser");
-    user = (User)session.getAttribute("currentUser");
-
-    if(user == null) {
-       // response.sendRedirect("err.jsp");
-       response.sendRedirect(request.getContextPath()+"/err.jsp");
-      //  request.getRequestDispatcher("err.jsp").forward(request,response);
-
-       // request.getRequestDispatcher("err.jsp").forward(request,response);
-
-    }
-
-
-    try {
-        System.out.println("Arrive try");
-        getAllCategories();
-        getSpendByMonth();
-        getIncomeByMonth();
-        getTotalAmountByMonth();
-
-        System.out.println("max days in month: " + maxDaysInMonth);
-        System.out.println("current day: " + dayOfMonth);
-        totalForMonth = Math.abs(spendForMonth + incomeForMonth);
-
-
-    } catch (CostManagementException e) {
-        e.printStackTrace();
-    }*/
 %>
 
 
