@@ -1,5 +1,11 @@
 package il.ac.hit.costmanagement;
 
+
+/**
+ *
+ * This class is the settings of the app and uses for reflection
+ *
+ */
 public class Settings {
 
     public static String WEB_APPLICATION = "costmanagement";

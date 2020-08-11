@@ -44,6 +44,11 @@ public class CostManagementDAO implements IIncomingDAO,
     }
 
 
+    /**
+     * Add a new income
+     * @param incoming The object that represent the details of the incoming
+     * @throws CostManagementException if there is an exception in Hibernate
+     */
     @Override
     public void addIncoming(Incoming incoming) throws CostManagementException {
 
@@ -81,6 +86,11 @@ public class CostManagementDAO implements IIncomingDAO,
     }
 
 
+    /**
+     * Delete income by transaction id
+     * @param id the transaction id of the incoming
+     * @throws CostManagementException if there is an exception in Hibernate
+     */
     @Override
     public void deleteIncoming(int id) throws CostManagementException {
 
@@ -134,6 +144,13 @@ public class CostManagementDAO implements IIncomingDAO,
         }
     }
 
+    /**
+     * Get an income by selected user and selected month
+     * @param id the user id
+     * @param month the selected month
+     * @return income amount for the selected month
+     * @throws CostManagementException if there is an exception in Hibernate
+     */
     @Override
     public double getIncomeByMonth(int id, int month) throws CostManagementException {
 
@@ -188,6 +205,11 @@ public class CostManagementDAO implements IIncomingDAO,
         }
     }
 
+    /**
+     * Add a new spend
+     * @param spend the object the represent the spend info
+     * @throws CostManagementException if there is an exception in Hibernate
+     */
     @Override
     public void addSpend(Spend spend) throws CostManagementException {
 
@@ -223,6 +245,11 @@ public class CostManagementDAO implements IIncomingDAO,
         }
     }
 
+    /**
+     * Delete spend by transaction id
+     * @param id the transaction id of the spend
+     * @throws CostManagementException if there is an exception in Hibernate
+     */
     @Override
     public void deleteSpend(int id) throws CostManagementException {
 
@@ -276,6 +303,13 @@ public class CostManagementDAO implements IIncomingDAO,
 
     }
 
+    /**
+     * Get the spend amount by category
+     * @param userId the id of the selected user
+     * @param category the name of the selected category
+     * @return the amount spend by the selected category
+     * @throws CostManagementException if there is an exception in Hibernate
+     */
     @Override
     public double getSpendByCategory(int userId, String category) throws CostManagementException {
 
@@ -342,6 +376,13 @@ public class CostManagementDAO implements IIncomingDAO,
         return amountCategory;
     }
 
+    /**
+     * Get the spend by selected month
+     * @param id the id of the user
+     * @param month the selected month
+     * @return the spend amount for month by the selected month
+     * @throws CostManagementException if there is an exception in Hibernate
+     */
     @Override
     public double getSpendByMonth(int id, int month) throws CostManagementException {
 
@@ -358,7 +399,6 @@ public class CostManagementDAO implements IIncomingDAO,
             hql.setParameter("id", id);
             List<Spend> spendList = hql.list();
 
-            System.out.println("spndlist " + spendList.toString());
 
             if (session.getTransaction().getStatus() == TransactionStatus.FAILED_COMMIT) {
                 if (session.getTransaction().isActive())
@@ -372,26 +412,16 @@ public class CostManagementDAO implements IIncomingDAO,
                 return 0;
             }
 
-
                 spendTable = spendList.get(0);
                 Iterator<Spend> iterator = spendList.iterator();
-                System.out.println("size: spendlist " + spendList.size());
-                System.out.println("SpendTable amount : " + spendTable.getAmount());
                 while (iterator.hasNext()) {
-                    System.out.println("Spend in while: " + spend);
-                    System.out.println("curent month: " + month +"\n local date: " + spendTable.getDate().toLocalDate().getMonth().getValue());
-                    System.out.println("TransAction id: " + spendTable.getTransactionId());
                     if (month == spendTable.getDate().toLocalDate().getMonth().getValue()) {
                         spend = spend + spendTable.getAmount();
                     }
-                    System.out.println("Spend table: " + spendTable);
                     spendTable = iterator.next();
 
                 }
-                System.out.println("Spend in model: " + spend);
                 return spend;
-
-
         }
 
 
@@ -408,7 +438,13 @@ public class CostManagementDAO implements IIncomingDAO,
 
     }
 
-
+    /**
+     * Get total income by month
+     * @param id the id of the user
+     * @param month thr selected month
+     * @return the total income amount for the selected month
+     * @throws CostManagementException if there is an exception in Hibernate
+     */
     @Override
     public double getTotalIncomeByMonth(int id, int month) throws CostManagementException {
         spend = 0;
@@ -442,8 +478,6 @@ public class CostManagementDAO implements IIncomingDAO,
                 income = totalIncome.getAmountIncome();
             }
 
-            System.out.println("Costs for month " + month + ":\n Spend amount: " +spend + "\n Income amount: " + income
-                    + "\n Total: " + total);
         }
 
         catch (HibernateException e){
@@ -460,6 +494,13 @@ public class CostManagementDAO implements IIncomingDAO,
         return income;
     }
 
+    /**
+     * Get total spend by month
+     * @param id the user id
+     * @param month the selected month
+     * @return the total spend amount for the selected month
+     * @throws CostManagementException if there is an exception in Hibernate
+     */
     @Override
     public double getTotalSpendByMonth(int id, int month) throws CostManagementException {
         spend = 0;
@@ -490,8 +531,6 @@ public class CostManagementDAO implements IIncomingDAO,
                 spend = totalSpend.getAmountSpend();
             }
 
-            System.out.println(" Costs for month " + month + ":\n Spend amount: " +spend + "\n Income amount: " + income
-                    + "\n Total: " + total);
         }
 
         catch (HibernateException e){
@@ -508,6 +547,13 @@ public class CostManagementDAO implements IIncomingDAO,
         return spend;
     }
 
+    /**
+     * Get total amount spend and income by month
+     * @param id the user id
+     * @param month the selected month
+     * @return the total spend and income
+     * @throws CostManagementException if there is an exception in Hibernate
+     */
     @Override
     public double getTotalAmountByMonth(int id, int month) throws CostManagementException {
 
@@ -544,8 +590,6 @@ public class CostManagementDAO implements IIncomingDAO,
                 total = Math.abs(income + spend);
             }
 
-            System.out.println(" Costs for month " + month + ":\n Spend amount: " +spend + "\n Income amount: " + income
-                    + "\n Total: " + total);
         }
 
         catch (HibernateException e){
@@ -562,6 +606,13 @@ public class CostManagementDAO implements IIncomingDAO,
         return total;
     }
 
+    /**
+     * Get total amount spend by selected year
+     * @param id the user id
+     * @param year the selected ye
+     * @return ar total amount spend by selected year
+     * @throws CostManagementException if there is an exception in Hibernate
+     */
     @Override
     public double getTotalSpendByYear(int id, int year) throws CostManagementException {
 
@@ -601,8 +652,6 @@ public class CostManagementDAO implements IIncomingDAO,
                 total = income - spend;
             }
 
-            System.out.println(" Costs for year " + year + ":\n Spend amount: " +spend + "\n Income amount: " + income
-                    + "\n Total: " + total);
         }
 
         catch (HibernateException e){
@@ -619,6 +668,11 @@ public class CostManagementDAO implements IIncomingDAO,
         return total;
     }
 
+    /**
+     * Add spend to the total spend in month
+     * @param spend represent the spend information
+     * @throws CostManagementException if there is an exception in Hibernate
+     */
     @Override
     public void addSpendToTotalSpend(Spend spend) throws CostManagementException {
 
@@ -679,6 +733,11 @@ public class CostManagementDAO implements IIncomingDAO,
         }
     }
 
+    /**
+     * Add income to toal income
+     * @param incoming represent the income information
+     * @throws CostManagementException if there is an exception in Hibernate
+     */
     @Override
     public void addIncomeToTotalSpend(Incoming incoming) throws CostManagementException {
 
@@ -731,6 +790,11 @@ public class CostManagementDAO implements IIncomingDAO,
         }
     }
 
+    /**
+     * Delete spend from total spend
+     * @param spend represent the spend information
+     * @throws CostManagementException if there is an exception in Hibernate
+     */
     @Override
     public void deleteSpendFromTotalSpend(Spend spend) throws CostManagementException {
 
@@ -773,6 +837,11 @@ public class CostManagementDAO implements IIncomingDAO,
 
     }
 
+    /**
+     * Delete income from total spend
+     * @param incoming represent the spend information
+     * @throws CostManagementException if there is an exception in Hibernate
+     */
     @Override
     public void deleteIncomeFromTotalSpend(Incoming incoming) throws CostManagementException {
 
@@ -816,6 +885,12 @@ public class CostManagementDAO implements IIncomingDAO,
 
     }
 
+    /**
+     * Register a new user
+     * @param user represent the information of the user
+     * @return true for succeed , otherwise false
+     * @throws CostManagementException if there is an exception in Hibernate
+     */
     @Override
     public boolean registerUser(User user) throws CostManagementException {
 
@@ -869,6 +944,13 @@ public class CostManagementDAO implements IIncomingDAO,
         }
     }
 
+    /**
+     * Authenticate the user
+     * @param userName the email of the user
+     * @param password the password of the user
+     * @return true if succeed, otherwise false
+     * @throws CostManagementException if there is an exception in Hibernate
+     */
     @Override
     public boolean userAuthentication(String userName, String password) throws CostManagementException {
 
@@ -922,8 +1004,14 @@ public class CostManagementDAO implements IIncomingDAO,
         }
     }
 
+    /**
+     * Get the current user that currently login
+     * @param userName the email of the user
+     * @return the id of the user
+     * @throws CostManagementException if there is an exception in Hibernate
+     */
     @Override
-    public User getCurrentUser(String userName) throws CostManagementException {
+    public int getCurrentUser(String userName) throws CostManagementException {
 
         if(!session.isOpen()){
             session = factory.openSession();
@@ -955,7 +1043,7 @@ public class CostManagementDAO implements IIncomingDAO,
                         new Throwable("The transaction was not committed"));
             }
 
-            return userList.get(0);
+            return userList.get(0).getId();
 
         } catch (HibernateException e) {
             if(session.getTransaction().isActive())

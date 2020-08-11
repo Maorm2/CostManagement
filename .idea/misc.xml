@@ -4,7 +4,7 @@
     <option name="languageLevel" value="JSX" />
   </component>
   <component name="JavadocGenerationManager">
-    <option name="OUTPUT_DIRECTORY" value="$PROJECT_DIR$/.." />
+    <option name="OUTPUT_DIRECTORY" value="$PROJECT_DIR$/../מאור/CostManagement Project" />
   </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />

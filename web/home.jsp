@@ -12,6 +12,8 @@
     int dayOfMonth = date.getDayOfMonth();
 
 
+
+
     double totalForMonth = 0;
     double spendForMonth = 0;
     double incomeForMonth = 0;
@@ -20,17 +22,25 @@
 
 <%
 
+    System.out.println("Arrive");
+
+    System.out.println();
+
     spendForMonth = (double) request.getSession().getAttribute("spendForMonth");
     incomeForMonth = (double) request.getSession().getAttribute("incomeForMonth");
     totalForMonth = (double) request.getSession().getAttribute("totalAmountForMonth");
 
-%>
+    System.out.println(spendForMonth);
+    System.out.println(incomeForMonth);
+    System.out.println(totalForMonth);
 
+%>
+<%--<html>
 
 <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
 <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
 <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
-<!------ Include the above in your HEAD tag ---------->
+<!------ Include the above in your HEAD tag ---------->--%>
 
 
 
@@ -1306,31 +1316,3 @@ ReactDOM.render(React.createElement(GoalList, { data: goals }), document.getElem
 </body></html>
 
 
-<%!
-   /* private void getTotalAmountByMonth() throws CostManagementException {
-        totalForMonth = totalSpendDAO.getTotalAmountByMonth(user.getId(),month);
-    }
-
-    private void getIncomeByMonth() throws CostManagementException {
-        incomeForMonth = totalSpendDAO.getTotalIncomeByMonth(user.getId(),month);
-    }
-
-    private void getSpendByMonth() throws CostManagementException {
-        spendForMonth = totalSpendDAO.getTotalSpendByMonth(user.getId(),month);
-        System.out.println("in FUNCTION: " + spendForMonth);
-    }
-
-    public void getAllCategories() throws CostManagementException {
-        System.out.println("Arrive all categories");
-        shopping = spendDAO.getSpendByCategory(user,"Shopping");
-        transport = spendDAO.getSpendByCategory(user,"Transport");
-        restaurant = spendDAO.getSpendByCategory(user,"Restaurant");
-        health = spendDAO.getSpendByCategory(user,"Health");
-        family = spendDAO.getSpendByCategory(user,"Family");
-        groceries = spendDAO.getSpendByCategory(user,"Groceries");
-        leisure = spendDAO.getSpendByCategory(user,"Leisure");
-        government = spendDAO.getSpendByCategory(user,"Government");
-        food = spendDAO.getSpendByCategory(user,"Food");
-        System.out.println("end all categories");
-    }*/
-%>

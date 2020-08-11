@@ -1,7 +1,3 @@
-
-
-
-
 package il.ac.hit.costmanagement.exception;
 
 

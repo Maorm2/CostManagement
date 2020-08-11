@@ -1,17 +1,26 @@
 package il.ac.hit.costmanagement.rest;
 
-import com.google.gson.JsonObject;
-import il.ac.hit.costmanagement.dm.User;
 import il.ac.hit.costmanagement.exception.CostManagementException;
 import il.ac.hit.costmanagement.model.CostManagementDAO;
 import il.ac.hit.costmanagement.model.ISpendDAO;
 import il.ac.hit.costmanagement.model.ITotalSpend;
-import jdk.nashorn.internal.parser.JSONParser;
 import org.json.JSONObject;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Response;
+import java.sql.Date;
+import java.util.Calendar;
+
+/**
+ *
+ *
+ * This class is for home services of the user
+ * using RESTful web services
+ *
+ */
 
 
 @Path("/home")
@@ -22,68 +31,68 @@ public class HomeService {
 
     /**
      * Getting all the costs of the current year
-     * @param allYearCost JSON object that represent data from request and the data of response
+     // * @param allYearCost JSON object that represent data from request and the data of response
      * @return JSON object that represent the costs of each month of the currently year
      */
     @GET
-    @Path("/yearcosts")
+    @Path("/yearcosts/{userId}")
     @Consumes({"application/json"})
-    public JSONObject getAllYearCosts(String allYearCost) {
-        JSONObject response = new JSONObject(allYearCost);
+    public Response getAllYearCosts(@PathParam("userId") int id) {
 
-        int userId = (int) response.get("currentUser");
-        int month = (int) response.get("month");
+        JSONObject response = new JSONObject();
 
-        double totalSpendForMonth = 0;
-        double totalIncomeForMonth = 0;
+        int month = new Date(Calendar.getInstance().getTimeInMillis()).toLocalDate().getMonth().getValue();
+
+        String totalSpendForMonth = "0";
+        String totalIncomeForMonth = "0";
 
 
-        double januarySpend = 0;
-        double februarySpend = 0;
-        double marchSpend = 0;
-        double aprilSpend = 0;
-        double maySpend = 0;
-        double juneSpend = 0;
-        double julySpend = 0;
-        double augustSpend = 0;
-        double septemberSpend = 0;
-        double octoberSpend = 0;
-        double novemberSpend = 0;
-        double decemberSpend = 0;
+        String januarySpend = "0";
+        String februarySpend = "0";
+        String marchSpend = "0";
+        String aprilSpend = "0";
+        String maySpend = "0";
+        String juneSpend = "0";
+        String julySpend = "0";
+        String augustSpend = "0";
+        String septemberSpend = "0";
+        String octoberSpend = "0";
+        String novemberSpend = "0";
+        String decemberSpend = "0";
 
-        double[] monthsSpend = {januarySpend, februarySpend, marchSpend, aprilSpend,
+        String[] monthsSpend = {januarySpend, februarySpend, marchSpend, aprilSpend,
                 maySpend, juneSpend, julySpend, augustSpend, septemberSpend, octoberSpend,
                 novemberSpend, decemberSpend};
 
 
-        double januaryIncome = 0;
-        double februaryIncome = 0;
-        double marchIncome = 0;
-        double aprilIncome = 0;
-        double mayIncome = 0;
-        double juneIncome = 0;
-        double julyIncome = 0;
-        double augustIncome = 0;
-        double septemberIncome = 0;
-        double octoberIncome = 0;
-        double novemberIncome = 0;
-        double decemberIncome = 0;
+        String januaryIncome = "0";
+        String februaryIncome = "0";
+        String marchIncome = "0";
+        String aprilIncome = "0";
+        String mayIncome = "0";
+        String juneIncome = "0";
+        String julyIncome = "0";
+        String augustIncome = "0";
+        String septemberIncome = "0";
+        String octoberIncome = "0";
+        String novemberIncome = "0";
+        String decemberIncome = "0";
 
-        double[] monthIncome = {januaryIncome, februaryIncome, marchIncome, aprilIncome,
+        String[] monthIncome = {januaryIncome, februaryIncome, marchIncome, aprilIncome,
                 mayIncome, juneIncome, julyIncome, augustIncome, septemberIncome, octoberIncome,
                 novemberIncome, decemberIncome};
 
         try {
 
             for (int i = 0; i < monthsSpend.length; i++) {
-                monthsSpend[i] = totalSpendDAO.getTotalSpendByMonth(userId, i+1);
+                monthsSpend[i] = String.valueOf(totalSpendDAO.getTotalSpendByMonth(id, i+1));
                 if (i+1 == month)
                     totalSpendForMonth = monthsSpend[i];
             }
 
 
             for (int currentMonth = 0; currentMonth < monthIncome.length; currentMonth++) {
-                monthIncome[currentMonth] = totalSpendDAO.getTotalIncomeByMonth(userId, currentMonth+1);
+                monthIncome[currentMonth] = String.valueOf(totalSpendDAO.getTotalIncomeByMonth(id, currentMonth+1));
                 if (currentMonth+1 == month)
                     totalIncomeForMonth = monthIncome[currentMonth];
             }
@@ -102,8 +111,6 @@ public class HomeService {
             response.put("novemberSpend", monthsSpend[10]);
             response.put("decemberSpend", monthsSpend[11]);
 
-            response.put("test",augustIncome);
-
             response.put("totalSpendForMonth", totalSpendForMonth);
 
             response.put("januaryIncome",  monthIncome[0]);
@@ -121,11 +128,14 @@ public class HomeService {
 
             response.put("totalIncomeForMonth", totalIncomeForMonth);
 
-            return response.put("status","OK");
+            response.put("status","OK");
+            return Response.status(Response.Status.OK).entity(response.toString()).build();
         }
         catch (CostManagementException e){
             e.printStackTrace();
-            return response.put("status","ERROR");
+            response.put("status","ERROR");
+            response.put("errorMessage",e.getMessage());
+            return Response.status(Response.Status.NOT_FOUND).entity(response.toString()).build();
         }
 
     }
@@ -133,27 +143,26 @@ public class HomeService {
 
     /**
      * Getting all the monthly spend per each category
-     * @param categories JSON object that represent the request of all categories
+     * @param userId the id of the selected user
      * @return the amount spend of each category
-     * @throws CostManagementException
      */
     @GET
+    @Path("/categories/{userid}")
     @Consumes({"application/json"})
-    public JSONObject getAllCategories(String categories) throws CostManagementException {
+    public Response getAllCategories(@PathParam("userid") int userId) {
 
-        JSONObject response = new JSONObject(categories);
+        JSONObject response = new JSONObject();
         try {
-            int userId = (int) response.get("currentUser");
 
-            double shopping = spendDAO.getSpendByCategory(userId, "Shopping");
-            double transport = spendDAO.getSpendByCategory(userId, "Transport");
-            double restaurant = spendDAO.getSpendByCategory(userId, "Restaurant");
-            double health = spendDAO.getSpendByCategory(userId, "Health");
-            double family = spendDAO.getSpendByCategory(userId, "Family");
-            double groceries = spendDAO.getSpendByCategory(userId, "Groceries");
-            double leisure = spendDAO.getSpendByCategory(userId, "Leisure");
-            double government = spendDAO.getSpendByCategory(userId, "Government");
-            double food = spendDAO.getSpendByCategory(userId, "Food");
+            String shopping = String.valueOf(spendDAO.getSpendByCategory(userId, "Shopping"));
+            String transport = String.valueOf(spendDAO.getSpendByCategory(userId, "Transport"));
+            String restaurant = String.valueOf(spendDAO.getSpendByCategory(userId, "Restaurant"));
+            String health = String.valueOf(spendDAO.getSpendByCategory(userId, "Health"));
+            String family = String.valueOf(spendDAO.getSpendByCategory(userId, "Family"));
+            String groceries = String.valueOf(spendDAO.getSpendByCategory(userId, "Groceries"));
+            String leisure = String.valueOf(spendDAO.getSpendByCategory(userId, "Leisure"));
+            String government = String.valueOf(spendDAO.getSpendByCategory(userId, "Government"));
+            String food = String.valueOf(spendDAO.getSpendByCategory(userId, "Food"));
 
             response.put("Shopping", shopping);
             response.put("Transport", transport);
@@ -165,12 +174,14 @@ public class HomeService {
             response.put("Government", government);
             response.put("Food", food);
 
-            return response.put("status","OK");
+            response.put("status","OK");
+            return Response.status(Response.Status.OK).entity(response.toString()).build();
         }
         catch (CostManagementException e){
             e.printStackTrace();
-             response.put("status","ERROR");
-            return response.put("errorMessage",e.getMessage());
+            response.put("status","ERROR");
+            response.put("errorMessage",e.getMessage());
+            return Response.status(Response.Status.NOT_FOUND).entity(response.toString()).build();
         }
     }
 
@@ -181,23 +192,26 @@ public class HomeService {
      */
     @GET
     @Path("/getspendformonth")
-    @Consumes({"application/json"})
-    public JSONObject getSpendForMonth(JSONObject spend) {
+    public Response getSpendForMonth(String spend) {
 
-        JSONObject totalSpend = new JSONObject();
+        JSONObject totalSpend = new JSONObject(spend);
         try {
-            User user = (User) spend.get("currentUser");
-            int month = (Integer) spend.get("month");
+            int userId = (int) totalSpend.get("currentUser");
+            int month = (Integer) totalSpend.get("month");
 
-            double spendForMonth = totalSpendDAO.getTotalSpendByMonth(user.getId(), month);
-
+            String spendForMonth = String.valueOf(totalSpendDAO.getTotalSpendByMonth(userId, month));
+            System.out.println("double total spend: " + spendForMonth);
             totalSpend.put("spendForMonth", spendForMonth);
-            return totalSpend.put("status", "OK");
+            totalSpend.put("status","OK");
+            System.out.println("total: " + totalSpend.toString());
+            return Response.status(Response.Status.OK).entity(totalSpend.toString()).build();
+
         }
         catch (CostManagementException e){
             e.printStackTrace();
             totalSpend.put("status","ERROR");
-            return totalSpend.put("errorMessage",e.getMessage());
+            totalSpend.put("errorMessage",e.getMessage());
+            return Response.status(Response.Status.NOT_FOUND).entity(totalSpend.toString()).build();
         }
     }
 
@@ -205,26 +219,28 @@ public class HomeService {
      * Getting the income amount of the current month
      * @param income JSON object the represent the current user and the selected month
      * @return income amount for the current month
-     * @throws CostManagementException
+     *
      */
     @GET
     @Path("/monthincome")
     @Consumes({"application/json"})
-    public JSONObject getIncomeForMonth(JSONObject income)  {
-        JSONObject totalIncome = new JSONObject();
+    public Response getIncomeForMonth(String income)  {
+        JSONObject totalIncome = new JSONObject(income);
         try {
-            User user = (User) income.get("currentUser");
-            int month = (Integer) income.get("month");
+            int  userId = (int) totalIncome.get("currentUser");
+            int month = (Integer) totalIncome.get("month");
 
-            double incomeForMonth = totalSpendDAO.getTotalIncomeByMonth(user.getId(), month);
+            String incomeForMonth = String.valueOf(totalSpendDAO.getTotalIncomeByMonth(userId, month));
 
             totalIncome.put("incomeForMonth", incomeForMonth);
-            return totalIncome.put("status","OK");
+            totalIncome.put("status","OK");
+            return Response.status(Response.Status.OK).entity(totalIncome.toString()).build();
         }
         catch (CostManagementException e){
             e.printStackTrace();
             totalIncome.put("status","ERROR");
-            return totalIncome.put("errorMessage",e.getMessage());
+            totalIncome.put("errorMessage",e.getMessage());
+            return Response.status(Response.Status.NOT_FOUND).entity(totalIncome.toString()).build();
         }
     }
 
@@ -235,22 +251,23 @@ public class HomeService {
      */
     @GET
     @Path("/totalamount")
-    @Consumes({"application/json"})
-    public JSONObject getTotalAmount(JSONObject amount) {
-        JSONObject totalAmount = new JSONObject();
+    public Response getTotalAmount(String amount) {
+        JSONObject totalAmount = new JSONObject(amount);
         try {
-            User user = (User) amount.get("currentUser");
-            int month = (Integer) amount.get("month");
+            int userId =totalAmount.getInt("currentUser");
+            int month = totalAmount.getInt("month");
 
-            double totalAmountForMonth = totalSpendDAO.getTotalAmountByMonth(user.getId(), month);
+            String totalAmountForMonth = String.valueOf(totalSpendDAO.getTotalAmountByMonth(userId, month));
 
             totalAmount.put("totalAmountForMonth", totalAmountForMonth);
-            return totalAmount.put("status","OK");
+            totalAmount.put("status","OK");
+            return Response.status(Response.Status.OK).entity(totalAmount.toString()).build();
         }
         catch (CostManagementException e){
             e.printStackTrace();
             totalAmount.put("status","ERROR");
-            return totalAmount.put("errorMessage",e.getMessage());
+            totalAmount.put("errorMessage",e.getMessage());
+            return Response.status(Response.Status.NOT_FOUND).entity(totalAmount.toString()).build();
         }
     }
 
